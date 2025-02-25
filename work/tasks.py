@@ -53,6 +53,25 @@ def make_gear(character: CharacterAPI):
     character.move_character(bank_x,bank_y)
     character.deposit_all_inventory_to_bank()
 
+def gather_sunflowers_and_craft_gear(character: CharacterAPI):
+    flowers_x,flowers_y = find_sunflowers()
+    bank_x,bank_y = find_bank()
+    forge_x,forge_y = find_forge()
+
+    response = character.withdraw_from_bank('copper',6)
+    while response:
+        x,y = character.find_closest_content('workshop', 'jewelrycrafting')
+        character.move_character(x,y)
+        character.craft('copper_ring',1)
+        character.move_character(bank_x,bank_y)
+        character.deposit_all_inventory_to_bank()
+        response = character.withdraw_from_bank('copper',6)
+
+    character.move_character(flowers_x, flowers_y)
+    character.gather(10)
+    character.move_character(bank_x,bank_y)
+    character.deposit_all_inventory_to_bank()
+
 def gather_copper_and_craft_gear(character: CharacterAPI):
     copper_x,copper_y = find_copper()
     bank_x,bank_y = find_bank()
@@ -191,6 +210,10 @@ def find_copper():
     logger.info("copper rocks at (2,0)")
     return 2,0
 
+def find_sunflowers():
+    logger.info("sunflowers at (2,2)")
+    return 2,2
+
 def find_forge():
     logger.info("forge at (1,5)")
     return 1,5
@@ -264,13 +287,6 @@ def exchange_task_coins(character: CharacterAPI):
     character.move_character(x,y)
     character.deposit_all_inventory_to_bank()
 
-alltasks = {
-    "exchange_task_coins": exchange_task_coins,
-    "make_gear": make_gear,
-    "do_tasks": do_tasks,
-    "gather_copper_and_craft_gear": gather_copper_and_craft_gear,
-    "gather_copper": gather_copper,
-    "kill_next_weakest": kill_next_weakest,
-    "craft": craft,
-}
-
+def alltasks():
+    function_mapping = {name: obj for name, obj in globals().items() if callable(obj)}
+    return function_mapping

@@ -42,7 +42,6 @@ class CharacterAPI:
             if not code or quantity <= 0:
                 continue
 
-            self.logger.info(f"{self.current_character}: Depositing {quantity} of {code} into the bank.")
             self.deposit_to_bank(code, quantity)
 
         self.logger.info(f"{self.current_character}: All items deposited into the bank.")
@@ -194,6 +193,10 @@ class CharacterAPI:
         Returns:
             Optional[Dict]: The API response, or None if the request fails.
         """
+
+        if (quantity <= 0):
+            return
+        
         self.logger.info(f"{self.current_character}: Depositing {quantity} of {code} into the bank.")
         
         # Prepare the payload
@@ -316,6 +319,7 @@ class CharacterAPI:
             self.logger.info(f'weaponcraft level {character_json.get("weaponcrafting_level", 0)} {character_json.get("weaponcrafting_xp", 0)}/{character_json.get("weaponcrafting_max_xp", 0)}')
             self.logger.info(f'gearcraft level {character_json.get("gearcrafting_level", 0)} {character_json.get("gearcrafting_xp", 0)}/{character_json.get("gearcrafting_max_xp", 0)}')
             self.logger.info(f'jewelrycraft level {character_json.get("jewelrycrafting_level", 0)} {character_json.get("jewelrycrafting_xp", 0)}/{character_json.get("jewelrycrafting_max_xp", 0)}')
+            self.logger.info(f'alchemy level {character_json.get("alchemy_level", 0)} {character_json.get("alchemy_xp", 0)}/{character_json.get("alchemy_max_xp", 0)}')
             if items_crafted:
                 self.logger.info(f"{self.current_character}: Items crafted:")
                 for item in items_crafted:

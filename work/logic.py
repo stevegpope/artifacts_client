@@ -28,8 +28,8 @@ def process():
         logger.info("Start Gatherer")
         start_queue(api, 'gatherer')
     elif (character == 'baz4'):
-        logger.info("Start Gatherer")
-        start_queue(api, 'gatherer')
+        logger.info("Start Learner")
+        start_queue(api, 'learner')
 
 def start_queue(character: CharacterAPI, role: str):
     # Start at the bank
@@ -71,13 +71,13 @@ def choose_task(role: str):
     if task and task['role'] == role:
         logger.info(f"New task {task}")
         clear_tasks_file()
-        return alltasks[task['name']]
+        return alltasks()[task['name']]
 
     logger.info("Default task")
 
     if role == 'fighter':
-        return alltasks['kill_next_weakest']
+        return alltasks()['kill_next_weakest']
     elif role == 'crafter':
-        return alltasks['gather_copper_and_craft_gear']
+        return alltasks()['gather_sunflowers_and_craft_gear']
     elif role == 'gatherer':
-        return alltasks['gather_copper']
+        return alltasks()['gather_copper']
