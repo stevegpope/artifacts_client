@@ -1,0 +1,10 @@
+# Ignore config.ini
+config.ini
+
+# Ignore Python compiled files
+__pycache__/
+*.pyc
+
+# Ignore other files
+*.log
+*.tmp
