@@ -25,11 +25,7 @@ class CharacterAPI:
         """
         Iterates through the character's inventory and deposits all items into the bank.
         """
-        if not self.character:
-            self.logger.error(f"{self.current_character}: Character data not available.")
-            return
-
-        inventory = self.character.get("inventory", [])
+        inventory = self.get_character().get('inventory',{})
         if not inventory:
             self.logger.info(f"{self.current_character}: Inventory is empty. Nothing to deposit.")
             return
@@ -122,6 +118,7 @@ class CharacterAPI:
                 x = tile['x']
                 y = tile['y']
         
+        self.logger.info(f"closest {content_type} {content_code} at {x},{y}")
         return x,y
 
     def get_bank_contents(self) -> Optional[Dict]:
@@ -145,8 +142,9 @@ class CharacterAPI:
         for item in data:
             if item['code'] == code:
                 quantity = item['quantity']
-                self.withdraw_from_bank(code,quantity)
-                return quantity
+                take = min(100,quantity)
+                self.withdraw_from_bank(code,take)
+                return take
         return 0
 
     def withdraw_from_bank(self, code: str, quantity: int) -> Optional[Dict]:
@@ -279,6 +277,36 @@ class CharacterAPI:
         if response:
             self.logger.info(f"{self.current_character}: Successfully completed task: {response}")
 
+    def equip_utility(self, code: str):
+        character_data = self.get_character()
+        existing_quantity = 0
+        slot = 'utility1'
+        if character_data['utility1_slot'] == code or character_data.get('utility1_slot','') == '':
+            slot = 'utility1'
+            existing_quantity = character_data.get('utility1_slot_quantity',0)
+        elif character_data['utility2_slot'] == code or character_data.get('utility2_slot','') == '':
+            slot = 'utility2'
+            existing_quantity = character_data.get('utility2_slot_quantity',0)
+        else:
+            self.logger.info("No slots available")
+
+        for item in character_data['inventory']:
+            if item['code'] == code:
+                quantity = item['quantity']
+                max_equip = 100 - existing_quantity
+                equip_quantity = min(quantity, max_equip)
+
+                payload = {
+                    "code": code,
+                    "slot": slot,
+                    "quantity": equip_quantity
+                }
+
+                self.logger.info(f"{self.current_character}: Equip {equip_quantity} {code} into {slot}")
+                response = self.make_api_request("POST", f"/my/{self.current_character}/action/equip", payload)
+                if response:
+                    self.logger.info(f"{self.current_character}: Successfully equipped {code} into {slot}.")
+
     def equip(self, code: str, slot: str):
         """
         Equips an item with the specified code into the specified slot.
@@ -319,6 +347,8 @@ class CharacterAPI:
             self.logger.info(f'weaponcraft level {character_json.get("weaponcrafting_level", 0)} {character_json.get("weaponcrafting_xp", 0)}/{character_json.get("weaponcrafting_max_xp", 0)}')
             self.logger.info(f'gearcraft level {character_json.get("gearcrafting_level", 0)} {character_json.get("gearcrafting_xp", 0)}/{character_json.get("gearcrafting_max_xp", 0)}')
             self.logger.info(f'jewelrycraft level {character_json.get("jewelrycrafting_level", 0)} {character_json.get("jewelrycrafting_xp", 0)}/{character_json.get("jewelrycrafting_max_xp", 0)}')
+            self.logger.info(f'woodcutting level {character_json.get("woodcutting_level", 0)} {character_json.get("woodcutting_xp", 0)}/{character_json.get("woodcutting_max_hp", 0)}')
+            self.logger.info(f'mining level {character_json.get("mining_level", 0)} {character_json.get("mining_xp", 0)}/{character_json.get("mining_max_xp", 0)}')
             self.logger.info(f'alchemy level {character_json.get("alchemy_level", 0)} {character_json.get("alchemy_xp", 0)}/{character_json.get("alchemy_max_xp", 0)}')
             if items_crafted:
                 self.logger.info(f"{self.current_character}: Items crafted:")
@@ -352,7 +382,7 @@ class CharacterAPI:
         while gathered_quantity < target_quantity:
             response = self.make_api_request("POST", f"/my/{self.current_character}/action/gathering")
             if not response:
-                continue
+                return False
 
             details = response.get("data", {}).get("details", {})
             xp_gained = details.get("xp", 0)
@@ -372,7 +402,8 @@ class CharacterAPI:
             self.logger.info(f"{self.current_character}: Total {first_item_code} gathered: {gathered_quantity}/{target_quantity}")
             if gathered_quantity >= target_quantity:
                 self.logger.info(f"{self.current_character}: Target quantity of {first_item_code} reached. Exiting gather loop.")
-                return
+                return True
+        return False
 
     def rest(self):
         """
@@ -380,42 +411,51 @@ class CharacterAPI:
         Waits for the cooldown period after each rest.
         """
         while True:
+            if (self.eat()):
+                return
+            
             self.logger.info(f"{self.current_character}: Resting...")
             response = self.make_api_request("POST", f"/my/{self.current_character}/action/rest")
             if not response:
                 return
-
-            character_data = response.get("data", {}).get("character", {})
-            hp = character_data.get("hp", 0)
-            max_hp = character_data.get("max_hp", 0)
-            hp_restored = response.get("data", {}).get("hp_restored", 0)
-
-            self.logger.info(f"{self.current_character}: Restored {hp_restored} HP. Current HP: {hp}/{max_hp}")
-
-            if hp >= max_hp:
-                self.logger.info(f"{self.current_character}: Character HP is fully restored.")
-                return
             
-    def eat(self, character_data):
+            data = response.get("data", None)
+            if data:
+                character_data = data.get("data", {})
+                hp = character_data.get("hp", 0)
+                max_hp = character_data.get("max_hp", 0)
+                hp_restored = response.get("data", {}).get("hp_restored", 0)
+
+                self.logger.info(f"{self.current_character}: Restored {hp_restored} HP. Current HP: {hp}/{max_hp}")
+
+                if hp >= max_hp:
+                    self.logger.info(f"{self.current_character}: Character HP is fully restored.")
+                    return
+            
+    def eat(self):
+        character_data = self.get_character()
+        food = ['apple']
         for item in character_data['inventory']:
-            if item['code'] == 'apple':
+            if item['code'] in food:
                 payload = {
-                    "code": 'apple',
+                    "code": item['code'],
                     "quantity": 1
                 }
 
+                print(payload)
                 response = self.make_api_request(
                     "POST",
                     f"/my/{self.current_character}/action/use",
                     payload
                 )
                 if response:
-                    self.logger.info(f"{self.current_character}: Ate an apple")
+                    self.logger.info(f"{self.current_character}: Ate {item['code']}")
                     character_json = response.get("data", {}).get("character", {})
                     hp = character_json['hp']
                     max_hp = character_json['max_hp']
-                    if (hp < (max_hp/2)):
-                        self.eat(character_data)
+                    if (hp != max_hp):
+                        self.logger.info(f"{self.current_character}: Bit peckish stil...what else we got?")
+                        self.eat()
                     return True
         return False
 
@@ -436,7 +476,7 @@ class CharacterAPI:
             self.logger.info(f"{self.current_character}: Current hp {current_hp}, Max hp {max_hp}")
 
             if current_hp / max_hp < 0.5:
-                if (self.eat(character_data)):
+                if (self.eat()):
                     self.logger.info("Ate food, no rest for the wicked")
                 else:
                     self.logger.info(f"{self.current_character}: Health is below 50%. Resting...")
@@ -641,7 +681,7 @@ class CharacterAPI:
                     except ValueError:
                         self.logger.error(f"{self.current_character}: Failed to parse the response body as JSON.")
                 elif e.response.status_code > 400 and e.response.status_code < 500:
-                    self.logger.info(f"{self.current_character}: No action taken. Code {e.response.status_code}")
+                    self.logger.info(f"{self.current_character}: No action taken trying to {context}. Code {e.response.status_code}")
                 else:
                     self.logger.error(f"{self.current_character}: HTTP error occurred: {e}")
         else:

@@ -12,6 +12,25 @@ def setup_tasks(m_logger, m_token, m_character):
     character = m_character
     api = CharacterAPI(logger, m_token, m_character)
 
+def eat(character: CharacterAPI):
+    x,y = find_bank()
+    character.move_character(x,y)
+    character.withdraw_from_bank('small_health_potion',1)
+    character.eat()
+    return
+
+def craft_feather_coat(character: CharacterAPI):
+    bank_x,bank_y = find_bank()
+    character.move_character(bank_x,bank_y)
+    character.withdraw_from_bank('feather',50)
+    character.withdraw_from_bank('ash_plank',20)
+    x,y = character.find_closest_content('workshop', 'gearcrafting')
+    character.move_character(x,y)
+    character.unequip('weapon')
+    character.craft('feather_coat',10)
+    character.move_character(bank_x,bank_y)
+    character.deposit_all_inventory_to_bank()
+
 def craft(character: CharacterAPI, code: str = 'copper_armor'):
     bank_x,bank_y = find_bank()
     character.move_character(bank_x,bank_y)
@@ -53,22 +72,23 @@ def make_gear(character: CharacterAPI):
     character.move_character(bank_x,bank_y)
     character.deposit_all_inventory_to_bank()
 
-def gather_sunflowers_and_craft_gear(character: CharacterAPI):
+def gather_sunflowers_and_craft_potions(character: CharacterAPI):
     flowers_x,flowers_y = find_sunflowers()
     bank_x,bank_y = find_bank()
-    forge_x,forge_y = find_forge()
+    alchemy_x,alchemy_y = find_alchemy()
 
-    response = character.withdraw_from_bank('copper',6)
+    response = character.withdraw_from_bank('sunflower',60)
     while response:
-        x,y = character.find_closest_content('workshop', 'jewelrycrafting')
-        character.move_character(x,y)
-        character.craft('copper_ring',1)
+        character.move_character(alchemy_x,alchemy_y)
+        character.craft('small_health_potion',20)
         character.move_character(bank_x,bank_y)
         character.deposit_all_inventory_to_bank()
-        response = character.withdraw_from_bank('copper',6)
+        response = character.withdraw_from_bank('sunflower',60)
 
     character.move_character(flowers_x, flowers_y)
-    character.gather(10)
+    character.gather(60)
+    character.move_character(alchemy_x,alchemy_y)
+    character.craft('small_health_potion',20)
     character.move_character(bank_x,bank_y)
     character.deposit_all_inventory_to_bank()
 
@@ -93,7 +113,7 @@ def gather_copper_and_craft_gear(character: CharacterAPI):
     character.move_character(bank_x,bank_y)
     character.deposit_all_inventory_to_bank()
 
-def gather_copper_and_craft_weapons_loop(character: CharacterAPI):
+def gather_copper_and_craft_weapons(character: CharacterAPI):
     copper_x,copper_y = find_copper()
     bank_x,bank_y = find_bank()
     forge_x,forge_y = find_forge()
@@ -124,13 +144,17 @@ def do_tasks(character: CharacterAPI):
     handle_task(character, task)
 
 def clear_copper_ore(character: CharacterAPI):
-    x,y = find_bank()
-    character.move_character(x,y)
-    character.withdraw_all('copper_ore')
+    bank_x,bank_y = find_bank()
+    forge_x,forge_y = find_forge()
 
-    x,y = find_forge()
-    character.move_character(x,y)
-    character.craft('copper',10)
+    response = character.withdraw_from_bank('copper_ore',10)
+    while response:
+        character.move_character(forge_x,forge_y)
+        character.craft('copper',1)
+        character.move_character(bank_x,bank_y)
+        character.deposit_all_inventory_to_bank()
+        response = character.withdraw_from_bank('copper_ore',10)
+
 
 def clear_ash_wood(character: CharacterAPI):
     x,y = find_bank()
@@ -174,24 +198,60 @@ def gather_copper(character : CharacterAPI):
     character.move_character(bank_x,bank_y)
     character.deposit_all_inventory_to_bank()
 
-def gather_wood_loop(character: CharacterAPI):
+def gather_iron(character : CharacterAPI):
     bank_x,bank_y = find_bank()
+    iron_x,iron_y = character.find_closest_content('resource','iron_rocks')
+    forge_x,forge_y = find_forge()
+
+    character.move_character(iron_x, iron_y)
+    character.gather(30)
+    character.move_character(forge_x,forge_y)
+    character.craft('iron',3)
     character.move_character(bank_x,bank_y)
-    wood_x,wood_y = character.find_closest_content('resource', 'ash_tree')
-    woodcutting_x,woodcutting_y = character.find_closest_content('workshop', 'woodcutting')
     character.deposit_all_inventory_to_bank()
 
-    while True:
-        character.move_character(wood_x, wood_y)
-        character.gather(10)
-        character.move_character(woodcutting_x,woodcutting_y)
-        character.craft('ash_plank',1)
-        character.move_character(bank_x,bank_y)
-        character.deposit_all_inventory_to_bank()
+def gather_ash_tree(character: CharacterAPI):
+    gather_tree(character, 'ash')
+
+def gather_spruce_tree(character: CharacterAPI):
+    gather_tree(character, 'spruce')
+
+def gather_tree(character: CharacterAPI, tree: str):
+    gather(character, f'{tree}_tree','woodcutting',f'{tree}_plank')
+
+def gather(character: CharacterAPI, base_resource: str, workshop: str, final_resource: str):
+    bank_x,bank_y = find_bank()
+    base_x,base_y = character.find_closest_content('resource',base_resource)
+    shop_x,shop_y = character.find_closest_content('workshop',workshop)
+    character.move_character(base_x, base_y)
+    character.gather(30)
+    character.move_character(shop_x,shop_y)
+    character.craft(final_resource,3)
+    character.move_character(bank_x,bank_y)
+    character.deposit_all_inventory_to_bank()
+
+def hunt_chickens(character: CharacterAPI):
+    character.withdraw_from_bank('copper_dagger',1)
+    character.equip('copper_dagger','weapon')
+    x,y = character.find_closest_content('monster','chicken')
+    character.move_character(x,y)
+    character.fight(25)
+    x,y = find_bank()
+    character.move_character(x,y)
+    character.deposit_all_inventory_to_bank()
+
+def cut_ash_like_mad(character: CharacterAPI):
+    base_x,base_y = character.find_closest_content('resource','ash_tree')
+    character.move_character(base_x, base_y)
+    character.gather(3000)
 
 def find_bank():
     logger.info("bank at (4,1)")
     return 4,1
+
+def find_alchemy():
+    logger.info("alchemy at (2,3)")
+    return 2,3
 
 def find_monster():
     logger.info("chicken at (0,1)")
@@ -226,6 +286,13 @@ def find_taskmaster():
 def handle_monsters_task(character: CharacterAPI, task_data: Dict):
     logger.info(f"Handling monsters task: {task_data}")
     
+    # Take as many health potions with us as possible
+    logger.info("Get some potions for fighting")
+    x,y = find_bank()
+    character.move_character(x,y)
+    if character.withdraw_all('small_health_potion'):
+        character.equip_utility('small_health_potion')
+
     # Find the closest monster and move to its location
     x, y = character.find_closest_content("monster", task_data['code'])
     character.move_character(x, y)

@@ -5,16 +5,18 @@ from work.tasks import alltasks,setup_tasks,find_bank
 logger = None
 api = CharacterAPI
 character: str
+token: str
 
 def setup_logic(m_logger, m_token, m_character):
-    global logger, api, character
+    global logger, api, character, token
     logger = m_logger
+    token = m_token
     character = m_character
     api = CharacterAPI(logger, m_token, m_character)
     setup_tasks(m_logger,m_token,m_character)
 
 def process():
-    global character,api
+    global character,api,token
     if (character == 'baz'):
         logger.info("Start Fighter")
         start_queue(api, 'fighter')
@@ -28,8 +30,11 @@ def process():
         logger.info("Start Gatherer")
         start_queue(api, 'gatherer')
     elif (character == 'baz4'):
-        logger.info("Start Learner")
-        start_queue(api, 'learner')
+        start_queue(api, 'hunter')
+        #logger.info("Start smarty")
+        #from work.smarty import Smarty
+        #smarty = Smarty(logger, api)
+        #smarty.start()
 
 def start_queue(character: CharacterAPI, role: str):
     # Start at the bank
@@ -67,6 +72,7 @@ def clear_tasks_file():
     logger.info("Cleared tasks.txt")
 
 def choose_task(role: str):
+    global learner
     task = read_task_from_file()
     if task and task['role'] == role:
         logger.info(f"New task {task}")
@@ -78,6 +84,8 @@ def choose_task(role: str):
     if role == 'fighter':
         return alltasks()['kill_next_weakest']
     elif role == 'crafter':
-        return alltasks()['gather_sunflowers_and_craft_gear']
+        return alltasks()['hunt_chickens']
     elif role == 'gatherer':
-        return alltasks()['gather_copper']
+        return alltasks()['hunt_chickens']
+    elif role == 'hunter':
+        return alltasks()['hunt_chickens']
