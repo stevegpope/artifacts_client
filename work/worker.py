@@ -18,9 +18,9 @@ def process_data():
     process()
   
 
-def main_loop(token,character):
+def main_loop(token,character,role):
     """Run the main loop."""
-    setup_logic(logger, token, character)
+    setup_logic(logger, token, character, role)
         
     try:
         process_data()

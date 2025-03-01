@@ -42,7 +42,7 @@ class CharacterAPI:
 
         self.logger.info(f"{self.current_character}: All items deposited into the bank.")
 
-    def fight_xp(self):
+    def fight_xp(self, times: int):
         self.logger.info('Fight loop')
 
         monster_level = 1
@@ -50,7 +50,63 @@ class CharacterAPI:
         level = character['level']
         first_loss = False
 
-        while True:
+        index = 0
+        while index < times:
+            index += 1
+            response = self.make_api_request('GET', f'/monsters?&max_level={monster_level}')
+        
+            if not response or 'data' not in response:
+                self.logger.error('No monsters found or invalid response')
+                return None
+        
+            monsters = response['data']
+            if not monsters:
+                self.logger.info('No monsters found within the level range')
+                return None
+        
+            weakest_monster = max(monsters, key=lambda x: x['level'])
+            self.logger.info(f'Weakest monster found: {weakest_monster["name"]} (Level {weakest_monster["level"]})')
+        
+            x,y = self.find_closest_content('monster', weakest_monster['code'])
+            self.move_character(x,y)
+            response = self.fight()
+            data = response.get("data", {})
+            fight_data = data.get("fight", {})
+            character_data = data.get("character",{})
+            new_level = character_data['level']
+            result = fight_data.get("result", "unknown")
+
+            # Go back on a loss
+            if result != 'win':
+                first_loss = True
+                monster_level -= 1
+                self.rest()
+                self.logger.info(f"Lost, going back to level {monster_level}")
+
+            # Go up if we never lost
+            if not first_loss:
+                monster_level += 1
+                self.rest()
+                self.logger.info(f"Never lost, going up to level {monster_level}")
+
+            # Try to go up on level up
+            if new_level > level:
+                level = new_level
+                monster_level += 1
+                self.rest()
+                self.logger.info(f"Level up, going up to level {monster_level}")
+
+    def fight_xp(self, times: int):
+        self.logger.info('Fight loop')
+
+        monster_level = 1
+        character = self.get_character()
+        level = character['level']
+        first_loss = False
+        attempts = 0
+
+        while attempts < times:
+            attempts += 1
             response = self.make_api_request('GET', f'/monsters?&max_level={monster_level}')
         
             if not response or 'data' not in response:
@@ -131,7 +187,6 @@ class CharacterAPI:
         )
 
         if response:
-            self.logger.info(f"{self.current_character}: {response}")
             return response
         
         return None
@@ -246,18 +301,18 @@ class CharacterAPI:
             }
 
         # If no current task, request a new one
-        self.logger.info("{self.current_character}: No current task. Requesting a new task...")
+        self.logger.info(f"{self.current_character}: No current task. Requesting a new task...")
         x, y = self.find_taskmaster()
         self.move_character(x, y)
         response = self.make_api_request("POST", f"/my/{self.current_character}/action/task/new")
         if not response:
-            self.logger.error("{self.current_character}: Failed to request a new task.")
+            self.logger.error(f"{self.current_character}: Failed to request a new task.")
             return None
 
         # Extract the task data from the response
         task_data = response.get("data", {}).get("task", {})
         if not task_data:
-            self.logger.error("{self.current_character}: No task data found in the response.")
+            self.logger.error(f"{self.current_character}: No task data found in the response.")
             return None
 
         # Log the assigned task details
@@ -331,6 +386,7 @@ class CharacterAPI:
         self.logger.info(f"{self.current_character}: Crafting {item_code} {amount} time(s)")
 
         for _ in range(amount):
+            self.unequip('weapon')
             response = self.make_api_request("POST", f"/my/{self.current_character}/action/crafting", {"code": item_code})
             if not response:
                 self.logger.error(f"{self.current_character}: Failed to craft item.")
@@ -578,6 +634,50 @@ class CharacterAPI:
 
             # Make the API request with the constructed query string
             response = self.make_api_request("GET", f"/maps?{query_params}")
+            if not response:
+                break
+
+            # Append the data and update pagination details
+            all_data.extend(response.get("data", []))
+            total_pages = response.get("pages", 1)
+            self.logger.info(f"{self.current_character}: Fetched page {page} of {total_pages}")
+            page += 1
+
+        return all_data
+
+    def fetch_items(self) -> List[Dict]:
+        all_data = []
+        page = 1
+        total_pages = 1
+
+        while page <= total_pages:
+            # Build the query string based on provided parameters
+            query_params = f"page={page}"
+
+            # Make the API request with the constructed query string
+            response = self.make_api_request("GET", f"/items?{query_params}")
+            if not response:
+                break
+
+            # Append the data and update pagination details
+            all_data.extend(response.get("data", []))
+            total_pages = response.get("pages", 1)
+            self.logger.info(f"{self.current_character}: Fetched page {page} of {total_pages}")
+            page += 1
+
+        return all_data
+
+    def fetch_monsters(self) -> List[Dict]:
+        all_data = []
+        page = 1
+        total_pages = 1
+
+        while page <= total_pages:
+            # Build the query string based on provided parameters
+            query_params = f"page={page}"
+
+            # Make the API request with the constructed query string
+            response = self.make_api_request("GET", f"/monsters?{query_params}")
             if not response:
                 break
 

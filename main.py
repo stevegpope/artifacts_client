@@ -11,11 +11,18 @@ if __name__ == "__main__":
         required=True,
         help="The name of the character to run the program for."
     )
+    parser.add_argument(
+        "--role",
+        type=str,
+        required=True,
+        help="The role of the character to run the program for."
+    )
     args = parser.parse_args()
 
     # Use the provided character name
     character_name = args.character
-    print(f"Starting program for character: {character_name}")
+    role = args.role
+    print(f"Starting program for character: {character_name}, role {role}")
 
     # Pass the token and character name to the main loop
-    main_loop(TOKEN, character_name)
+    main_loop(TOKEN, character_name, role)
