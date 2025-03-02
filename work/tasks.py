@@ -41,6 +41,7 @@ def fill_orders(character: CharacterAPI, role: str):
 
     if not chosen_task:
         if (role == 'fighter'):
+            gear_up(character)
             character.fight_xp(25)
             return True
         elif (role == 'gatherer'):
@@ -126,7 +127,7 @@ def eat(character: CharacterAPI):
 def craft_gear(character: CharacterAPI):
     # - pick a skill
     # - choose an item at the highest level we can craft
-    skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting', 'cooking']
+    skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting', 'cooking','alchemy']
     skill = random.choice(skills)
     item = choose_highest_item(character, skill)
     logger.info(f'highest level item {item}')
@@ -257,8 +258,8 @@ def choose_highest_item(character:CharacterAPI, skill: str):
     craft = chosen_item.get('craft','')
     craft_items = craft.get('items','')
     for item in craft_items:
-        if item['code'] == 'wooden_stick':
-            return craft_gear(character)
+        if item['code'] == 'wooden_stick' or item['code'] == 'jasper_crystal':
+            return choose_highest_item(character)
         
     if chosen_item:
         return chosen_item
