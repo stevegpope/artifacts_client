@@ -191,7 +191,8 @@ def order_items(character: CharacterAPI, item_code: str, quantity: int):
     if item.get('craft', None) != None:
         logger.info(f'to gather {item_code} we need to craft it')
         if item_code == 'copper' or item_code == 'iron':
-            task_queue.create_task({"role":"gatherer","code": item_code})
+            for index in range(quantity):
+                task_queue.create_task({"role":"gatherer","code": item_code})
         else:
             for index in range(quantity):
                 craft_item(character, item, quantity)
