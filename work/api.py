@@ -42,7 +42,7 @@ class CharacterAPI:
 
         self.logger.info(f"{self.current_character}: All items deposited into the bank.")
 
-    def fight_xp(self, times: int):
+    def fight_xp(self, times: int = 1):
         self.logger.info('Fight loop')
 
         monster_level = 1

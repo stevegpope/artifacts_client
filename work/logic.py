@@ -1,6 +1,7 @@
 from typing import Dict, List
 from work.api import CharacterAPI
 import os
+from work.smarty import Smarty
 from work.tasks import alltasks, fill_orders, gear_up,setup_tasks,find_bank
 
 logger = None
@@ -24,16 +25,17 @@ def process():
     bank_x,bank_y = find_bank()
     api.move_character(bank_x,bank_y)
     api.deposit_all_inventory_to_bank()
+    if role == 'smarty':
+        smarty = Smarty(logger, api)
 
     while True:
-        api.rest()
-        fill_orders(api, role)
-        api.move_character(bank_x,bank_y)
-        api.deposit_all_inventory_to_bank()
-    #logger.info("Start smarty")
-    #from work.smarty import Smarty
-    #smarty = Smarty(logger, api)
-    #smarty.start()
+        if role == 'smarty':
+            smarty.do_something_smart()
+        else:
+            api.rest()
+            fill_orders(api, role)
+            api.move_character(bank_x,bank_y)
+            api.deposit_all_inventory_to_bank()
 
 def start_queue(character: CharacterAPI, role: str):
     # Start at the bank

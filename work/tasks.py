@@ -33,7 +33,7 @@ def fill_orders(character: CharacterAPI, role: str):
     index = 1
     for task in tasks:
         task_role = task.get('role',None)
-        if task_role == role or task.get('code','') == 'feather':
+        if task_role == role or role == 'smarty' or task.get('code','') == 'feather':
             chosen_task = task
             task_queue.delete_task(index)
             break
@@ -50,6 +50,15 @@ def fill_orders(character: CharacterAPI, role: str):
     else:
         logger.info(f"fill order for {task['code']}")
         gather(character, task['code'])
+
+def rest(character: CharacterAPI):
+    character.rest()
+
+def hunt_monsters(character: CharacterAPI):
+    bank_x,bank_y = find_bank()
+    character.move_character(bank_x,bank_y)
+    character.deposit_all_inventory_to_bank()
+    character.fight_xp(25)
 
 
 def gear_up(character: CharacterAPI):
@@ -460,12 +469,6 @@ def clear_ash_wood(character: CharacterAPI):
     x,y = find_gearcraft()
     character.move_character(x,y)
     character.craft('wooden_shield',1)
-
-def kill_next_weakest(character: CharacterAPI):
-    bank_x,bank_y = find_bank()
-    character.move_character(bank_x,bank_y)
-    character.deposit_all_inventory_to_bank()
-    character.fight_xp()
 
 def make_wooden_shield(character: CharacterAPI):
     bank_x,bank_y = find_bank()

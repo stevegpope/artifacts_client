@@ -1,1 +1,26 @@
-[]
+[
+    {
+        "role": "gatherer",
+        "code": "copper"
+    },
+    {
+        "role": "gatherer",
+        "code": "copper"
+    },
+    {
+        "role": "gatherer",
+        "code": "copper"
+    },
+    {
+        "role": "gatherer",
+        "code": "copper"
+    },
+    {
+        "role": "gatherer",
+        "code": "copper"
+    },
+    {
+        "role": "gatherer",
+        "code": "copper"
+    }
+]
