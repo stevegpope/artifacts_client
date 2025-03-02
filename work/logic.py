@@ -22,12 +22,15 @@ def process():
     global character,api,token
 
     bank_x,bank_y = find_bank()
+    api.move_character(bank_x,bank_y)
+    api.deposit_all_inventory_to_bank()
+    gear_up(api)
 
     while True:
+        api.rest()
+        fill_orders(api, role)
         api.move_character(bank_x,bank_y)
         api.deposit_all_inventory_to_bank()
-        gear_up(api)
-        fill_orders(api, role)
     #logger.info("Start smarty")
     #from work.smarty import Smarty
     #smarty = Smarty(logger, api)
@@ -49,7 +52,7 @@ def choose_task(role: str):
     if role == 'fighter':
         return alltasks()['fill_orders']
     elif role == 'crafter':
-        return alltasks()['craft_gear']
+        return alltasks()['fill_orders']
     elif role == 'gatherer':
         return alltasks()['fill_orders']
     elif role == 'hunter':

@@ -689,6 +689,28 @@ class CharacterAPI:
 
         return all_data
 
+    def fetch_resources(self) -> List[Dict]:
+        all_data = []
+        page = 1
+        total_pages = 1
+
+        while page <= total_pages:
+            # Build the query string based on provided parameters
+            query_params = f"page={page}"
+
+            # Make the API request with the constructed query string
+            response = self.make_api_request("GET", f"/resources?{query_params}")
+            if not response:
+                break
+
+            # Append the data and update pagination details
+            all_data.extend(response.get("data", []))
+            total_pages = response.get("pages", 1)
+            self.logger.info(f"{self.current_character}: Fetched page {page} of {total_pages}")
+            page += 1
+
+        return all_data
+
     def make_api_request(self, method: str, endpoint: str, payload: Optional[Dict] = None) -> Optional[Dict]:
         """
         Makes an API request and returns the JSON response.

@@ -1,1 +1,226 @@
-[]
+[
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron_ore"
+    }
+]

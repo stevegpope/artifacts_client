@@ -38,12 +38,6 @@ class TaskQueue:
     def read_tasks(self):
         """Read and return all tasks in the queue."""
         tasks = self._read_tasks()
-        if tasks:
-            print("Tasks in the queue:")
-            for i, task in enumerate(tasks, start=1):
-                print(f"{i}. {json.dumps(task, indent=4)}")
-        else:
-            print("The task queue is empty.")
         return tasks
 
     def update_task(self, task_index, new_task):
