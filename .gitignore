@@ -9,3 +9,4 @@ __pycache__/
 *.log
 *.tmp
 /venv
+work/tasks/tasks.txt

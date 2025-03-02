@@ -143,6 +143,7 @@ def craft_item(character: CharacterAPI, item: Dict, quantity: int = 1):
         return False
 
     requirements = craft.get('items',{})
+    bank_x,bank_y=find_bank()
 
     first_pass = True
     while True:
@@ -169,6 +170,8 @@ def craft_item(character: CharacterAPI, item: Dict, quantity: int = 1):
     character.move_character(shop_x, shop_y)
     character.move_character(shop_x,shop_y)
     character.craft(item['code'],quantity)
+    character.move_character(bank_x,bank_y)
+    character.deposit_to_bank(item['code'],quantity)
     return True
 
 def order_items(character: CharacterAPI, item_code: str, quantity: int):

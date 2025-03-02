@@ -1,1 +1,10 @@
-[]
+[
+    {
+        "role": "gatherer",
+        "code": "iron"
+    },
+    {
+        "role": "gatherer",
+        "code": "iron"
+    }
+]
