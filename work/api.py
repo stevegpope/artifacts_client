@@ -526,7 +526,6 @@ class CharacterAPI:
         for i in range(combats):
             self.logger.info(f"{self.current_character}: Starting combat {i + 1} of {combats}")
 
-            character_data = self.get_character()
             current_hp = character_data.get("hp", 0)
             max_hp = character_data.get("max_hp", 1)
             self.logger.info(f"{self.current_character}: Current hp {current_hp}, Max hp {max_hp}")
@@ -545,6 +544,7 @@ class CharacterAPI:
                 self.move_character(original_x, original_y)
                 self.fight(combats - i)
                 return
+            
 
             fight_data = response.get("data", {}).get("fight", {})
             result = fight_data.get("result", "unknown")
@@ -566,6 +566,7 @@ class CharacterAPI:
                 self.logger.info(f"{self.current_character}: Drops:")
                 for drop in drops:
                     self.logger.info(f"{self.current_character}:   - {drop['code']}: {drop['quantity']}")
+            character_data = self.get_character()
             
         return response
 

@@ -23,6 +23,8 @@ def setup_tasks(m_logger, m_token, m_character, role):
     monsters = api.fetch_monsters()
     resources = api.fetch_resources()
     task_queue = TaskQueue()
+    if role == 'fighter':
+        gear_up(api)
 
 def fill_orders(character: CharacterAPI, role: str):
     tasks = task_queue.read_tasks()
@@ -188,14 +190,43 @@ def order_items(character: CharacterAPI, item_code: str, quantity: int):
     
     if item.get('craft', None) != None:
         logger.info(f'to gather {item_code} we need to craft it')
-        for index in range(quantity):
-            craft_item(character, item, quantity)
+        if item_code == 'copper' or item_code == 'iron':
+            task_queue.create_task({"role":"gatherer","code": item_code})
+        else:
+            for index in range(quantity):
+                craft_item(character, item, quantity)
         return True
 
     for index in range(quantity):
         task_queue.create_task({"role":"gatherer","code": item_code})
     return True
-    
+
+def gather_copper(character : CharacterAPI):
+    logger.info("Gathering a copper")
+    copper_x,copper_y = find_copper()
+    bank_x,bank_y = find_bank()
+    forge_x,forge_y = find_forge()
+    character.move_character(copper_x, copper_y)
+    character.gather(10)
+    character.move_character(forge_x,forge_y)
+    character.craft('copper',1)
+    character.move_character(bank_x,bank_y)
+    character.deposit_all_inventory_to_bank()
+    return True
+
+def gather_iron(character : CharacterAPI):
+    logger.info("Gathering an iron")
+    bank_x,bank_y = find_bank()
+    iron_x,iron_y = character.find_closest_content('resource','iron_rocks')
+    forge_x,forge_y = find_forge()
+    character.move_character(iron_x, iron_y)
+    character.gather(10)
+    character.move_character(forge_x,forge_y)
+    character.craft('iron',1)
+    character.move_character(bank_x,bank_y)
+    character.deposit_all_inventory_to_bank()
+    return True
+
 def choose_highest_item(character:CharacterAPI, skill: str):
     character_data = character.get_character()
     skill_level = character_data.get(f"{skill}_level", 0)
@@ -225,11 +256,19 @@ def choose_highest_item(character:CharacterAPI, skill: str):
         if item['code'] == 'wooden_stick':
             return craft_gear(character)
         
-    return chosen_item
+    if chosen_item:
+        return chosen_item
+    else:
+        return choose_highest_item(character, skill)
 
 def gather(character: CharacterAPI, item_code: str):
     logger.info(f'Gather one {item_code}')
 
+    if item_code == 'copper':
+        return gather_copper(character)
+    elif item_code == 'iron':
+        return gather_iron(character)
+    
     item = get_item(item_code)
     if item['type'] != 'resource':
         logger.info(f'item is not resource to gather: {item}')
@@ -434,29 +473,6 @@ def make_wooden_shield(character: CharacterAPI):
     character.craft('wooden_staff')
     character.move_character(bank_x,bank_y)
     character.deposit_to_bank('wooden_staff',1)
-
-def gather_copper(character : CharacterAPI):
-    copper_x,copper_y = find_copper()
-    bank_x,bank_y = find_bank()
-    forge_x,forge_y = find_forge()
-    character.move_character(copper_x, copper_y)
-    character.gather(30)
-    character.move_character(forge_x,forge_y)
-    character.craft('copper',3)
-    character.move_character(bank_x,bank_y)
-    character.deposit_all_inventory_to_bank()
-
-def gather_iron(character : CharacterAPI):
-    bank_x,bank_y = find_bank()
-    iron_x,iron_y = character.find_closest_content('resource','iron_rocks')
-    forge_x,forge_y = find_forge()
-
-    character.move_character(iron_x, iron_y)
-    character.gather(30)
-    character.move_character(forge_x,forge_y)
-    character.craft('iron',3)
-    character.move_character(bank_x,bank_y)
-    character.deposit_all_inventory_to_bank()
 
 def hunt_chickens(character: CharacterAPI):
     x,y = character.find_closest_content('monster','chicken')

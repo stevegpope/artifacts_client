@@ -24,7 +24,6 @@ def process():
     bank_x,bank_y = find_bank()
     api.move_character(bank_x,bank_y)
     api.deposit_all_inventory_to_bank()
-    gear_up(api)
 
     while True:
         api.rest()
