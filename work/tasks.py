@@ -41,7 +41,7 @@ def fill_orders(character: CharacterAPI, role: str):
 
     if not chosen_task:
         if (role == 'fighter'):
-            character.fight_xp(10)
+            character.fight_xp(25)
             return True
         elif (role == 'gatherer'):
             craft_gear(character)

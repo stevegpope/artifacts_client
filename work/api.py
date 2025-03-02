@@ -96,61 +96,6 @@ class CharacterAPI:
                 self.rest()
                 self.logger.info(f"Level up, going up to level {monster_level}")
 
-    def fight_xp(self, times: int):
-        self.logger.info('Fight loop')
-
-        monster_level = 1
-        character = self.get_character()
-        level = character['level']
-        first_loss = False
-        attempts = 0
-
-        while attempts < times:
-            attempts += 1
-            response = self.make_api_request('GET', f'/monsters?&max_level={monster_level}')
-        
-            if not response or 'data' not in response:
-                self.logger.error('No monsters found or invalid response')
-                return None
-        
-            monsters = response['data']
-            if not monsters:
-                self.logger.info('No monsters found within the level range')
-                return None
-        
-            weakest_monster = max(monsters, key=lambda x: x['level'])
-            self.logger.info(f'Weakest monster found: {weakest_monster["name"]} (Level {weakest_monster["level"]})')
-        
-            x,y = self.find_closest_content('monster', weakest_monster['code'])
-            self.move_character(x,y)
-            response = self.fight()
-            data = response.get("data", {})
-            fight_data = data.get("fight", {})
-            character_data = data.get("character",{})
-            new_level = character_data['level']
-            result = fight_data.get("result", "unknown")
-
-            # Go back on a loss
-            if result != 'win':
-                first_loss = True
-                monster_level -= 1
-                self.rest()
-                self.logger.info(f"Lost, going back to level {monster_level}")
-
-            # Go up if we never lost
-            if not first_loss:
-                monster_level += 1
-                self.rest()
-                self.logger.info(f"Never lost, going up to level {monster_level}")
-
-            # Try to go up on level up
-            if new_level > level:
-                level = new_level
-                monster_level += 1
-                self.rest()
-                self.logger.info(f"Level up, going up to level {monster_level}")
-
-
     def find_closest_content(self, content_type: str, content_code: str):
         details = self.get_character()
         # Get the character's current position
