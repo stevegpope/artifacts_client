@@ -1,26 +1,94 @@
 [
     {
-        "role": "gatherer",
-        "code": "copper"
+        "role": "fighter",
+        "code": "green_cloth"
     },
     {
-        "role": "gatherer",
-        "code": "copper"
+        "role": "fighter",
+        "code": "green_cloth"
     },
     {
-        "role": "gatherer",
-        "code": "copper"
+        "role": "fighter",
+        "code": "green_cloth"
     },
     {
-        "role": "gatherer",
-        "code": "copper"
+        "role": "fighter",
+        "code": "red_slimeball"
     },
     {
-        "role": "gatherer",
-        "code": "copper"
+        "role": "fighter",
+        "code": "red_slimeball"
     },
     {
-        "role": "gatherer",
-        "code": "copper"
+        "role": "fighter",
+        "code": "red_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "red_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "mushroom"
+    },
+    {
+        "role": "fighter",
+        "code": "mushroom"
+    },
+    {
+        "role": "fighter",
+        "code": "mushroom"
+    },
+    {
+        "role": "fighter",
+        "code": "mushroom"
+    },
+    {
+        "role": "fighter",
+        "code": "mushroom"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "mushroom"
+    },
+    {
+        "role": "fighter",
+        "code": "mushroom"
+    },
+    {
+        "role": "fighter",
+        "code": "mushroom"
+    },
+    {
+        "role": "forager",
+        "code": "trout"
     }
 ]

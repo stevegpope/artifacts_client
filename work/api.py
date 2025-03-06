@@ -48,9 +48,9 @@ class CharacterAPI:
         monster_level = 1
         character = self.get_character()
         level = character['level']
-        first_loss = False
-
+        losses = 0
         index = 0
+
         while index < times:
             index += 1
             response = self.make_api_request('GET', f'/monsters?&max_level={monster_level}')
@@ -76,21 +76,22 @@ class CharacterAPI:
             new_level = character_data['level']
             result = fight_data.get("result", "unknown")
 
-            # Go back on a loss
+            # Go back on 3 losses in a row
             if result != 'win':
-                first_loss = True
-                monster_level -= 1
-                self.rest()
-                self.logger.info(f"Lost, going back to level {monster_level}")
-
-            # Go up if we never lost
-            if not first_loss:
-                monster_level += 1
-                self.rest()
-                self.logger.info(f"Never lost, going up to level {monster_level}")
+                losses += 1
+                if losses >= 3:
+                    monster_level -= 1
+                    self.rest()
+                    self.logger.info(f"Lost, going back to level {monster_level}")
+            else:
+                if losses < 3:
+                    monster_level += 1
+                    self.rest()
+                    self.logger.info(f"Never lost, going up to level {monster_level}")
 
             # Try to go up on level up
             if new_level > level:
+                losses = 0
                 level = new_level
                 monster_level += 1
                 self.rest()
@@ -122,24 +123,32 @@ class CharacterAPI:
         self.logger.info(f"closest {content_type} {content_code} at {x},{y}")
         return x,y
 
-    def get_bank_contents(self) -> Optional[Dict]:
-        self.logger.info(f"{self.current_character}: Getting bank contents")
-        
-        # Make the API request
-        response = self.make_api_request(
-            "GET",
-            f"/my/bank/items"
-        )
+    def get_bank_contents(self) -> List[Dict]:
+        all_data = []
+        page = 1
+        total_pages = 1
 
-        if response:
-            return response
-        
-        return None
+        while page <= total_pages:
+            # Build the query string based on provided parameters
+            query_params = f"page={page}"
+
+            # Make the API request with the constructed query string
+            response = self.make_api_request("GET", f"/my/bank/items?{query_params}")
+            if not response:
+                break
+
+            # Append the data and update pagination details
+            all_data.extend(response.get("data", []))
+            total_pages = response.get("pages", 1)
+            self.logger.info(f"{self.current_character}: Fetched page {page} of {total_pages}")
+            page += 1
+
+        return all_data
+
 
     def withdraw_all(self, code: str) -> int:
         contents = self.get_bank_contents()
-        data = contents['data']
-        for item in data:
+        for item in contents:
             if item['code'] == code:
                 quantity = item['quantity']
                 take = min(100,quantity)
@@ -329,9 +338,9 @@ class CharacterAPI:
             amount (int): The number of items to craft. Defaults to 1.
         """
         self.logger.info(f"{self.current_character}: Crafting {item_code} {amount} time(s)")
+        self.unequip('weapon')
 
         for _ in range(amount):
-            self.unequip('weapon')
             response = self.make_api_request("POST", f"/my/{self.current_character}/action/crafting", {"code": item_code})
             if not response:
                 self.logger.error(f"{self.current_character}: Failed to craft item.")
@@ -348,9 +357,10 @@ class CharacterAPI:
             self.logger.info(f'weaponcraft level {character_json.get("weaponcrafting_level", 0)} {character_json.get("weaponcrafting_xp", 0)}/{character_json.get("weaponcrafting_max_xp", 0)}')
             self.logger.info(f'gearcraft level {character_json.get("gearcrafting_level", 0)} {character_json.get("gearcrafting_xp", 0)}/{character_json.get("gearcrafting_max_xp", 0)}')
             self.logger.info(f'jewelrycraft level {character_json.get("jewelrycrafting_level", 0)} {character_json.get("jewelrycrafting_xp", 0)}/{character_json.get("jewelrycrafting_max_xp", 0)}')
-            self.logger.info(f'woodcutting level {character_json.get("woodcutting_level", 0)} {character_json.get("woodcutting_xp", 0)}/{character_json.get("woodcutting_max_hp", 0)}')
+            self.logger.info(f'woodcutting level {character_json.get("woodcutting_level", 0)} {character_json.get("woodcutting_xp", 0)}/{character_json.get("woodcutting_max_xp", 0)}')
             self.logger.info(f'mining level {character_json.get("mining_level", 0)} {character_json.get("mining_xp", 0)}/{character_json.get("mining_max_xp", 0)}')
             self.logger.info(f'alchemy level {character_json.get("alchemy_level", 0)} {character_json.get("alchemy_xp", 0)}/{character_json.get("alchemy_max_xp", 0)}')
+            self.logger.info(f'cooking level {character_json.get("cooking_level", 0)} {character_json.get("cooking_xp", 0)}/{character_json.get("cooking_max_xp", 0)}')
             if items_crafted:
                 self.logger.info(f"{self.current_character}: Items crafted:")
                 for item in items_crafted:
@@ -515,13 +525,65 @@ class CharacterAPI:
             
         return response
 
+    def fight_drop(self, quantity: int, item_code: str):
+        character_data = self.get_character()
+        original_x = character_data.get('x',0)
+        original_y = character_data.get('y',0)
+
+        total = 0
+        while total < quantity:
+            self.logger.info(f"{self.current_character}: Fight for {quantity - total} more items")
+
+            current_hp = character_data.get("hp", 0)
+            max_hp = character_data.get("max_hp", 1)
+            self.logger.info(f"{self.current_character}: Current hp {current_hp}, Max hp {max_hp}")
+
+            if current_hp / max_hp < 0.5:
+                if (self.eat()):
+                    self.logger.info("Ate food, no rest for the wicked")
+                else:
+                    self.logger.info(f"{self.current_character}: Health is below 50%. Resting...")
+                    self.rest()
+
+            self.logger.info(f"{self.current_character}: Fight!!!")
+            response = self.make_api_request("POST", f"/my/{self.current_character}/action/fight")
+            if not response:
+                self.logger.info("Fucker moved me!")
+                self.move_character(original_x, original_y)
+                self.fight_drop(quantity - total, item_code)
+                return
+
+            fight_data = response.get("data", {}).get("fight", {})
+            result = fight_data.get("result", "unknown")
+            xp_gained = fight_data.get("xp", 0)
+            gold_gained = fight_data.get("gold", 0)
+            drops = fight_data.get("drops", [])
+
+            character_data = response.get("data", {}).get("character", {})
+            xp = character_data.get("xp", 0)
+            max_hp = character_data.get("max_xp", 0)
+            level = character_data.get("level", 0)
+
+            self.logger.info(f"{self.current_character}: Fight result: {result}")
+            self.logger.info(f"{self.current_character}: XP gained: {xp_gained}")
+            self.logger.info(f"{self.current_character}: Gold gained: {gold_gained}")
+            self.logger.info(f"{self.current_character}: Level {level} progress {xp}/{max_hp}")
+
+            if drops:
+                self.logger.info(f"{self.current_character}: Drops:")
+                for drop in drops:
+                    self.logger.info(f"{self.current_character}:   - {drop['code']}: {drop['quantity']}")
+                    if drop['code'] == item_code:
+                        total += drop.get('quantity',1)
+
     def get_character(self):
         """
         Retrieves the current character details
         """
         response = self.make_api_request("GET", f"/my/characters")
-        if not response:
-            return None
+        while not response:
+            time.sleep(5)
+            response = self.make_api_request("GET", f"/my/characters")
 
         characters_data = response.get("data", [])
         for character in characters_data:

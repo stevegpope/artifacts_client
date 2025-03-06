@@ -22,8 +22,8 @@ class Smarty:
         return response.json()['response']
         
     def generate_instructions(self) -> str:
-        actions = """work.tasks.gear_up(self.api);work.tasks.eat(self.api);work.tasks.craft_gear(self.api);work.tasks.do_tasks(self.api);work.tasks.hunt_monsters(self.api);"""
-        sample = """work.tasks.gear_up(self.api);work.tasks.eat(self.api);work.tasks.hunt_monsters(self.api);"""
+        actions = """work.tasks.craft_gear(self.api);work.tasks.eat(self.api);work.tasks.gear_up(self.api);work.tasks.do_tasks(self.api);work.tasks.hunt_monsters(self.api);"""
+        sample = """work.tasks.eat(self.api);work.tasks.gear_up(self.api);work.tasks.hunt_monsters(self.api);"""
 
         prompt = (
             f"Actions: {actions}\n"
