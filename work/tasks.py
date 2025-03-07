@@ -20,12 +20,10 @@ def setup_tasks(m_logger, m_token, m_character, role):
     character = m_character
     m_role = role
     api = CharacterAPI(logger, m_token, m_character)
-    items = api.fetch_items()
-    monsters = api.fetch_monsters()
-    resources = api.fetch_resources()
+    items = api.items
+    monsters = api.monsters
+    resources = api.resources
     task_queue = TaskQueue()
-    if role == 'fighter' or role == 'tasker':
-        gear_up(api)
 
 banned_tasks = []
 
@@ -77,6 +75,8 @@ def fill_orders(character: CharacterAPI, role: str):
             do_tasks(character)
         elif role == 'forager':
             gather_highest(character)
+        elif role == 'chef':
+            craft_gear(character, 'cooking')
     else:
         # Perform the gathered tasks
         task_count = len(chosen_tasks)
@@ -93,6 +93,27 @@ def gather_highest(character: CharacterAPI):
     skills = ['mining', 'woodcutting', 'fishing','alchemy']
     skill = random.choice(skills)
     logger.info(f'think I will go {skill} now')
+    if skill == 'mining':
+        logger.info(f"try and get pick")
+        if character.withdraw_from_bank('iron_pickaxe',1):
+            character.unequip('weapon')
+            character.equip('iron_pickaxe','weapon')
+    elif skill == 'woodcutting':
+        logger.info(f"try and get axe")
+        if character.withdraw_from_bank('iron_axe',1):
+            character.unequip('weapon')
+            character.equip('iron_axe','weapon')
+    elif skill == 'alchemy':
+        logger.info(f"try and get gloves")
+        if character.withdraw_from_bank('leather_gloves',1):
+            character.unequip('weapon')
+            character.equip('leather_gloves','weapon')
+    elif skill == 'fishing':
+        logger.info(f"try and get fishing rod")
+        if character.withdraw_from_bank('spruce_fishing_rod',1):
+            character.unequip('weapon')
+            character.equip('spruce_fishing_rod','weapon')
+
     character_data = character.get_character()
     skill_level = character_data.get(f"{skill}_level", 0)
     x,y = choose_random_resource(character, skill, skill_level)
@@ -100,6 +121,7 @@ def gather_highest(character: CharacterAPI):
     character.gather(10)
     x,y = find_bank()
     character.move_character(x,y)
+    character.unequip('weapon')
     character.deposit_all_inventory_to_bank()
 
 def rest(character: CharacterAPI):
@@ -120,6 +142,10 @@ def gear_up(character: CharacterAPI):
     character_data = character.get_character()
     for item in contents:
         equip_better_item(character, item['code'], character_data)
+        item = get_item(item['code'])
+        if item['type'] == 'consumable' and item['subtype'] == 'food':
+            logger.info(f"load up on food {item['code']}")
+            character.withdraw_all(item['code'])
 
 def equip_better_item(character: CharacterAPI, item_code, character_data):
     new_item = get_item(item_code)
@@ -175,32 +201,30 @@ def get_item(item_code):
     return None
 
 
-def eat(character: CharacterAPI):
-    x,y = find_bank()
-    character.move_character(x,y)
-    character.withdraw_from_bank('small_health_potion',1)
-    character.eat()
-    return
-
-def craft_gear(character: CharacterAPI):
-    # - pick a skill
-    # - choose an item at the highest level we can craft
-    skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting', 'cooking','alchemy']
-    character_data = character.get_character()
-    lowest_skill: str
-    lowest_level = 100
-    for skill in skills:
-        skill_level = character_data.get(f"{skill}_level", 0)
-        if skill_level < lowest_level:
-            lowest_level = skill_level
-            lowest_skill = skill
+def craft_gear(character: CharacterAPI, skill: str = None):
+    if not skill:
+        # - pick a skill if not given
+        # - choose an item at the highest level we can craft
+        skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting', 'cooking','alchemy']
+        character_data = character.get_character()
+        lowest_skill: str
+        lowest_level = 100
+        quantity = 1
+        for skill in skills:
+            skill_level = character_data.get(f"{skill}_level", 0)
+            if skill_level < lowest_level:
+                lowest_level = skill_level
+                lowest_skill = skill
+    else:
+        quantity = 10
+        lowest_skill = skill
 
     item = choose_highest_item(character, lowest_skill)
     logger.info(f'highest level item {item}')
     while not item:
         item = choose_highest_item(character, random.choice(skills))
     
-    if not craft_item(character, item):
+    if not craft_item(character, item, quantity):
         logger.info(f"can't craft {item['code']} now, leave in current orders")
     else:
         logger.info(f"finished making {item['code']}, removing from current orders")
@@ -269,7 +293,8 @@ def order_items(character: CharacterAPI, item_code: str, quantity: int):
         logger.info(f'cannot gather task item {item}')
         return False
     
-    if subtype == 'mob':
+    # raw wolf meat is mislabeled!
+    if subtype == 'mob' or item_code == 'raw_wolf_meat' or item_code == 'milk_bucket' or item_code == 'raw_beef':
         for index in range(quantity):
             task_queue.create_task({"role":"fighter","code": item_code})
         return True
@@ -324,15 +349,18 @@ def choose_highest_item(character: CharacterAPI, skill: str):
     logger.info(f"choose_highest_item: current orders {current_orders}")
     character_data = character.get_character()
     skill_level = character_data.get(f"{skill}_level", 0)
+    logger.info(f"choose_highest_item {skill} skill level {skill_level}")
     
     # Get all craftable items at or below the character's skill level
-    craftable_items = [
-        item for item in items
-        if item.get("craft")
-        and item["craft"].get("skill") == skill
-        and item["craft"].get("level", 0) <= skill_level
-        and item["craft"].get("level", 0) >= skill_level - 10
-    ]
+    craftable_items = []
+
+    for item in items:
+        craft = item.get('craft')
+        if craft:
+            if craft.get("skill") == skill:
+                item_level = craft.get("level", 0)
+                if item_level <= skill_level and item_level >= skill_level - 10:
+                    craftable_items.append(item)
     
     if not craftable_items:
         logger.info(f'cannot craft anything for {skill}')
@@ -394,11 +422,33 @@ def gather(character: CharacterAPI, item_code: str, quantity: int):
         craft_item(character, item, quantity)
         return True
 
+    if subtype == 'mining':
+        logger.info(f"try and get pick")
+        if character.withdraw_from_bank('iron_pickaxe',1):
+            character.unequip('weapon')
+            character.equip('iron_pickaxe','weapon')
+    elif subtype == 'woodcutting':
+        logger.info(f"try and get axe")
+        if character.withdraw_from_bank('iron_axe',1):
+            character.unequip('weapon')
+            character.equip('iron_axe','weapon')
+    elif subtype == 'alchemy':
+        logger.info(f"try and get gloves")
+        if character.withdraw_from_bank('leather_gloves',1):
+            character.unequip('weapon')
+            character.equip('leather_gloves','weapon')
+    elif subtype == 'fishing':
+        logger.info(f"try and get fishing rod")
+        if character.withdraw_from_bank('spruce_fishing_rod',1):
+            character.unequip('weapon')
+            character.equip('spruce_fishing_rod','weapon')
+
     x,y = find_resource_drop(character,item_code)
     character.move_character(x,y)
     result = character.gather(quantity)
     x,y = find_bank()
     character.move_character(x,y)
+    character.unequip('weapon')
     character.deposit_all_inventory_to_bank()
     return result
 

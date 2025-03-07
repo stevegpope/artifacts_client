@@ -20,6 +20,9 @@ class CharacterAPI:
         self.current_character = character_name
         self.character = self.get_character()
         self.logger.info(self.character)
+        self.items: List[Dict] = self.fetch_items()
+        self.monsters: List[Dict] = self.fetch_monsters()
+        self.resources: List[Dict] = self.fetch_resources()
 
     def deposit_all_inventory_to_bank(self):
         """
@@ -84,6 +87,7 @@ class CharacterAPI:
                     self.rest()
                     self.logger.info(f"Lost, going back to level {monster_level}")
             else:
+                losses = 0
                 if losses < 3:
                     monster_level += 1
                     self.rest()
@@ -353,7 +357,7 @@ class CharacterAPI:
 
             character_json = response.get("data", {}).get("character", {})
 
-            self.logger.info(f"{self.current_character}: Crafted {item_code}")
+            self.logger.info(f"{self.current_character}: Crafted {item_code} for {xp_gained}xp")
             self.logger.info(f'weaponcraft level {character_json.get("weaponcrafting_level", 0)} {character_json.get("weaponcrafting_xp", 0)}/{character_json.get("weaponcrafting_max_xp", 0)}')
             self.logger.info(f'gearcraft level {character_json.get("gearcrafting_level", 0)} {character_json.get("gearcrafting_xp", 0)}/{character_json.get("gearcrafting_max_xp", 0)}')
             self.logger.info(f'jewelrycraft level {character_json.get("jewelrycrafting_level", 0)} {character_json.get("jewelrycrafting_xp", 0)}/{character_json.get("jewelrycrafting_max_xp", 0)}')
@@ -445,15 +449,18 @@ class CharacterAPI:
             
     def eat(self):
         character_data = self.get_character()
-        food = ['apple']
-        for item in character_data['inventory']:
-            if item['code'] in food:
+        for inventory_item in character_data['inventory']:
+            item_code = inventory_item['code']
+            for item in self.items:
+                if item["code"] == item_code:
+                    break
+
+            if item['type'] == 'consumable' and item['subtype'] == 'food':
                 payload = {
-                    "code": item['code'],
+                    "code": item_code,
                     "quantity": 1
                 }
 
-                print(payload)
                 response = self.make_api_request(
                     "POST",
                     f"/my/{self.current_character}/action/use",
