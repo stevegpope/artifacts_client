@@ -54,7 +54,7 @@ def choose_task(role: str):
         return alltasks()['fill_orders']
     elif role == 'crafter':
         return alltasks()['fill_orders']
-    elif role == 'gatherer':
+    elif role == 'crafter':
         return alltasks()['fill_orders']
     elif role == 'hunter':
         return alltasks()['fill_orders']

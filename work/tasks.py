@@ -44,14 +44,14 @@ def fill_orders(character: CharacterAPI, role: str):
 
         if not chosen_tasks:
             # First matching task — lock in the code and role
-            if ((task_role == role or (task_role == 'forager' and role == 'gatherer')) or role == 'smarty') and not task_code in banned_tasks:
+            if ((task_role == role or (task_role == 'forager' and role == 'crafter')) or role == 'smarty') and not task_code in banned_tasks:
                 logger.info(f'first banned tasks: {banned_tasks}, code {task_code}')
                 chosen_tasks.append(task)
                 chosen_code = task_code
                 tasks_to_delete.append(index)
         else:
             # Only collect tasks with the same role+code
-            if (task_role == role or (task_role == 'forager' and role == 'gatherer')) and task_code == chosen_code:
+            if (task_role == role or (task_role == 'forager' and role == 'crafter')) and task_code == chosen_code:
                 chosen_tasks.append(task)
                 tasks_to_delete.append(index)
 
@@ -68,7 +68,7 @@ def fill_orders(character: CharacterAPI, role: str):
             gear_up(character)
             character.fight_xp(50)
             return True
-        elif role == 'gatherer':
+        elif role == 'crafter':
             craft_gear(character)
             return True
         elif role == 'tasker':
@@ -221,20 +221,23 @@ def craft_gear(character: CharacterAPI, skill: str = None):
 
     item = choose_highest_item(character, lowest_skill)
     logger.info(f'highest level item {item}')
-    while not item:
+    while not item and not item['code'] in banned_orders:
         item = choose_highest_item(character, random.choice(skills))
     
     if not craft_item(character, item, quantity):
-        logger.info(f"can't craft {item['code']} now, leave in current orders")
+        logger.info(f"can't craft {item['code']} now, banned")
+        banned_orders.append(item['code'])
+        current_orders.remove(item['code'])
     else:
         logger.info(f"finished making {item['code']}, removing from current orders")
         current_orders.remove(item['code'])
     logger.info(f"current orders {current_orders}")
+    logger.info(f"banned orders {banned_orders}")
 
 def craft_item(character: CharacterAPI, item: Dict, quantity: int = 1):
     # - go to the bank and try to get everything needed
     # - until we have it:
-    #   - order the items from gatherers
+    #   - order the items from crafters
     #   - gather ourselves and come back
     craft = item.get('craft',None)
     if not craft:
@@ -343,6 +346,7 @@ def gather_iron(character : CharacterAPI):
     return True
 
 current_orders = []
+banned_orders = []
 
 def choose_highest_item(character: CharacterAPI, skill: str):
     global current_orders

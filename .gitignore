@@ -11,3 +11,4 @@ __pycache__/
 /venv
 work/tasks/tasks.txt
 work/tasks/tasks.txt
+work/tasks/tasks.json

@@ -473,7 +473,7 @@ class CharacterAPI:
                     max_hp = character_json['max_hp']
                     if (hp != max_hp):
                         self.logger.info(f"{self.current_character}: Bit peckish stil...what else we got?")
-                        self.eat()
+                        return self.eat()
                     return True
         return False
 
@@ -557,11 +557,10 @@ class CharacterAPI:
             response = self.make_api_request("POST", f"/my/{self.current_character}/action/fight")
             if not response:
                 losses += 1
-                self.logger.info("Fucker moved me!")
+                self.logger.info(f"{losses} losses")
                 self.move_character(original_x, original_y)
-                self.fight_drop(quantity - total, item_code)
-                if losses > 3:
-                    self.logger.info(f"Can't beat {item_code}")
+                if losses >= 3:
+                    self.logger.info(f"Can't beat monster to get {item_code}")
                     return False
                 continue
 
