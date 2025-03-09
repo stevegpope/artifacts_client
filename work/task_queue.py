@@ -2,7 +2,7 @@ import os
 import json
 
 # Define the file path
-TASKS_FILE_PATH = "C:\\Users\\sarah\\Desktop\\code\\artifacts\\work\\tasks\\tasks.txt"
+TASKS_FILE_PATH = "C:\\Users\\sarah\\Desktop\\code\\artifacts\\work\\tasks\\tasks.json"
 
 class TaskQueue:
     def __init__(self, file_path=TASKS_FILE_PATH):

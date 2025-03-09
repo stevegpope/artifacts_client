@@ -414,8 +414,7 @@ def gather(character: CharacterAPI, item_code: str, quantity: int):
         x,y = find_monster_drop(character, item_code)
         character.move_character(x,y)
         character.rest()
-        character.fight_drop(quantity, item_code)
-        return True
+        return character.fight_drop(quantity, item_code)
     
     if item.get('craft', None) != None:
         logger.info(f'to gather {item_code} need to craft it')

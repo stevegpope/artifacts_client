@@ -538,6 +538,7 @@ class CharacterAPI:
         original_y = character_data.get('y',0)
 
         total = 0
+        losses = 0
         while total < quantity:
             self.logger.info(f"{self.current_character}: Fight for {quantity - total} more items")
 
@@ -555,10 +556,14 @@ class CharacterAPI:
             self.logger.info(f"{self.current_character}: Fight!!!")
             response = self.make_api_request("POST", f"/my/{self.current_character}/action/fight")
             if not response:
+                losses += 1
                 self.logger.info("Fucker moved me!")
                 self.move_character(original_x, original_y)
                 self.fight_drop(quantity - total, item_code)
-                return
+                if losses > 3:
+                    self.logger.info(f"Can't beat {item_code}")
+                    return False
+                continue
 
             fight_data = response.get("data", {}).get("fight", {})
             result = fight_data.get("result", "unknown")
@@ -582,6 +587,7 @@ class CharacterAPI:
                     self.logger.info(f"{self.current_character}:   - {drop['code']}: {drop['quantity']}")
                     if drop['code'] == item_code:
                         total += drop.get('quantity',1)
+        return True
 
     def get_character(self):
         """

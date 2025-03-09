@@ -1,0 +1,478 @@
+[
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "forager",
+        "code": "trout"
+    },
+    {
+        "role": "forager",
+        "code": "trout"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "forager",
+        "code": "trout"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "green_cloth"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "cowhide"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "flying_wing"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "yellow_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    },
+    {
+        "role": "fighter",
+        "code": "blue_slimeball"
+    }
+]

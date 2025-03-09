@@ -17,3 +17,5 @@ def load_config():
 
 config = load_config()
 TOKEN = config['DEFAULT']['token']
+if not TOKEN:
+    os.getenv("SECRET_TOKEN")
