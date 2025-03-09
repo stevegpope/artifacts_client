@@ -79,6 +79,8 @@ def fill_orders(character: CharacterAPI, role: str):
             gather_highest(character)
         elif role == 'chef':
             craft_gear(character, 'cooking')
+        elif role == 'alchemist':
+            craft_gear(character, 'alchemy')
     else:
         # Perform the gathered tasks
         task_count = len(chosen_tasks)
@@ -217,6 +219,7 @@ def craft_gear(character: CharacterAPI, skill: str = None):
             if skill_level < lowest_level:
                 lowest_level = skill_level
                 lowest_skill = skill
+                lowest_choice_level = skill_level - 10
     else:
         quantity = 10
         lowest_skill = skill
