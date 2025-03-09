@@ -540,7 +540,7 @@ class CharacterAPI:
         total = 0
         losses = 0
         while total < quantity:
-            self.logger.info(f"{self.current_character}: Fight for {quantity - total} more items")
+            self.logger.info(f"{self.current_character}: Fight for {quantity - total} more {item_code}")
 
             current_hp = character_data.get("hp", 0)
             max_hp = character_data.get("max_hp", 1)

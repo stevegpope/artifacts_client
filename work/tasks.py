@@ -62,10 +62,12 @@ def fill_orders(character: CharacterAPI, role: str):
     for index in reversed(tasks_to_delete):
         task_queue.delete_task(index)
 
+    if role == 'fighter':
+        gear_up(character)
+
     if not chosen_tasks:
         # Fallback behavior if no tasks found
         if role == 'fighter':
-            gear_up(character)
             character.fight_xp(50)
             return True
         elif role == 'crafter':
@@ -83,7 +85,7 @@ def fill_orders(character: CharacterAPI, role: str):
         logger.info(f"Filling order for {chosen_code} - {task_count} tasks")
         if not gather(character, chosen_code, task_count):
             logger.info(f'cannot gather {chosen_code}!, re-insert tasks')
-            banned_tasks.append(task['code'])
+            banned_tasks.append(chosen_code)
             logger.info(f'banned tasks after add: {banned_tasks}')
             for task in chosen_tasks:
                 task_queue.create_task(task)
@@ -218,8 +220,9 @@ def craft_gear(character: CharacterAPI, skill: str = None):
     else:
         quantity = 10
         lowest_skill = skill
+        lowest_choice_level = 1
 
-    item = choose_highest_item(character, lowest_skill)
+    item = choose_highest_item(character, lowest_skill, lowest_choice_level)
     logger.info(f'highest level item {item}')
     while not item and not item['code'] in banned_orders:
         item = choose_highest_item(character, random.choice(skills))
@@ -348,12 +351,14 @@ def gather_iron(character : CharacterAPI):
 current_orders = []
 banned_orders = []
 
-def choose_highest_item(character: CharacterAPI, skill: str):
+def choose_highest_item(character: CharacterAPI, skill: str, lowest_choice_level: int = 0):
     global current_orders
     logger.info(f"choose_highest_item: current orders {current_orders}")
     character_data = character.get_character()
     skill_level = character_data.get(f"{skill}_level", 0)
     logger.info(f"choose_highest_item {skill} skill level {skill_level}")
+    if not lowest_choice_level:
+        lowest_choice_level = skill_level - 10
     
     # Get all craftable items at or below the character's skill level
     craftable_items = []
@@ -363,7 +368,7 @@ def choose_highest_item(character: CharacterAPI, skill: str):
         if craft:
             if craft.get("skill") == skill:
                 item_level = craft.get("level", 0)
-                if item_level <= skill_level and item_level >= skill_level - 10:
+                if item_level <= skill_level and item_level >= lowest_choice_level and item['code'] not in banned_orders:
                     craftable_items.append(item)
     
     if not craftable_items:
@@ -414,7 +419,7 @@ def gather(character: CharacterAPI, item_code: str, quantity: int):
         logger.info(f'cannot gather task item {item}')
         return False
     
-    if subtype == 'mob':
+    if subtype == 'mob' or item_code == 'milk_bucket' or item_code == 'raw_wolf_meat':
         x,y = find_monster_drop(character, item_code)
         character.move_character(x,y)
         character.rest()
