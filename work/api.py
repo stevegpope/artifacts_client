@@ -23,6 +23,8 @@ class CharacterAPI:
         self.items: List[Dict] = self.fetch_items()
         self.monsters: List[Dict] = self.fetch_monsters()
         self.resources: List[Dict] = self.fetch_resources()
+        self.cache = {}
+        self.cache_timeout = 3000  # 5 minutes in seconds
 
     def deposit_all_inventory_to_bank(self):
         """
@@ -45,61 +47,41 @@ class CharacterAPI:
 
         self.logger.info(f"{self.current_character}: All items deposited into the bank.")
 
-    def fight_xp(self, times: int = 1):
+    def fight_xp(self):
         self.logger.info('Fight loop')
 
-        monster_level = 1
         character = self.get_character()
         level = character['level']
-        losses = 0
-        index = 0
+        target_monster_level = level - 10
 
-        while index < times:
-            index += 1
-            response = self.make_api_request('GET', f'/monsters?&max_level={monster_level}')
+        response = self.make_api_request('GET', f'/monsters?&min_level={target_monster_level}')
         
-            if not response or 'data' not in response:
-                self.logger.error('No monsters found or invalid response')
-                return None
+        if not response or 'data' not in response:
+            self.logger.error('No monsters found or invalid response')
+            return None
         
-            monsters = response['data']
-            if not monsters:
-                self.logger.info('No monsters found within the level range')
-                return None
+        monsters = response['data']
+        if not monsters:
+            self.logger.info('No monsters found within the level range')
+            return None
         
-            weakest_monster = max(monsters, key=lambda x: x['level'])
-            self.logger.info(f'Weakest monster found: {weakest_monster["name"]} (Level {weakest_monster["level"]})')
+        # Find the monster closest to target_monster_level
+        closest_monster = min(monsters, key=lambda x: abs(x['level'] - target_monster_level))
+        self.logger.info(f'Closest monster found: {closest_monster["name"]} (Level {closest_monster["level"]})')
         
-            x,y = self.find_closest_content('monster', weakest_monster['code'])
-            self.move_character(x,y)
+        x, y = self.find_closest_content('monster', closest_monster['code'])
+        self.move_character(x, y)
+
+        while True:
             response = self.fight()
             data = response.get("data", {})
-            fight_data = data.get("fight", {})
-            character_data = data.get("character",{})
+            character_data = data.get("character", {})
             new_level = character_data['level']
-            result = fight_data.get("result", "unknown")
 
-            # Go back on 3 losses in a row
-            if result != 'win':
-                losses += 1
-                if losses >= 3:
-                    monster_level -= 1
-                    self.rest()
-                    self.logger.info(f"Lost, going back to level {monster_level}")
-            else:
-                losses = 0
-                if losses < 3:
-                    monster_level += 1
-                    self.rest()
-                    self.logger.info(f"Never lost, going up to level {monster_level}")
-
-            # Try to go up on level up
+            # Check if the player leveled up
             if new_level > level:
-                losses = 0
-                level = new_level
-                monster_level += 1
-                self.rest()
-                self.logger.info(f"Level up, going up to level {monster_level}")
+                self.logger.info(f"Level up! New level: {new_level}")
+                return
 
     def find_closest_content(self, content_type: str, content_code: str):
         details = self.get_character()
@@ -230,6 +212,32 @@ class CharacterAPI:
             self.logger.error(f"{self.current_character}: Failed to deposit items into the bank.")
             return None
 
+    def recycle(self, code: str, quantity: int) -> Optional[Dict]:
+        if (quantity <= 0):
+            return
+        
+        self.logger.info(f"{self.current_character}: Recycle {quantity} {code}")
+        
+        # Prepare the payload
+        payload = {
+            "code": code,
+            "quantity": quantity
+        }
+
+        # Make the API request
+        response = self.make_api_request(
+            "POST",
+            f"/my/{self.current_character}/action/recycling",
+            payload
+        )
+
+        if response:
+            self.logger.info(f"{self.current_character}: Successfully recycled {quantity} of {code}.")
+            return response
+        else:
+            self.logger.error(f"{self.current_character}: Failed to recycle")
+            return None
+
     def choose_task(self) -> Optional[Dict]:
         """
         Returns the current task from the character data if one exists.
@@ -238,6 +246,7 @@ class CharacterAPI:
         Returns:
             Optional[Dict]: The current or newly assigned task data, or None if no task is available.
         """
+        self.character = self.get_character()
         if not self.character:
             self.logger.error(f"{self.current_character}: Character data not available.")
             return None
@@ -281,14 +290,25 @@ class CharacterAPI:
         return task_data
 
     def find_taskmaster(self):
-        self.logger.info("{self.current_character}: taskmaster at (1,2)")
-        return 1, 2
+        self.logger.info(f"{self.current_character}: items taskmaster at (4,13)")
+        return 4, 13
 
     def complete_task(self):
         self.logger.info(f"{self.current_character}: Complete task")
         response = self.make_api_request("POST", f"/my/{self.current_character}/action/task/complete")
         if response:
             self.logger.info(f"{self.current_character}: Successfully completed task: {response}")
+
+    def trade_task_items(self, code: str, quantity: int):
+        payload = {
+            "code": code,
+            "quantity": quantity
+        }
+
+        self.logger.info(f"{self.current_character}: Trade in {quantity} {code}")
+        response = self.make_api_request("POST", f"/my/{self.current_character}/action/task/trade", payload)
+        if response:
+            self.logger.info(f"{self.current_character}: Successfully traded items")
 
     def equip_utility(self, code: str):
         character_data = self.get_character()
@@ -344,15 +364,17 @@ class CharacterAPI:
         self.logger.info(f"{self.current_character}: Crafting {item_code} {amount} time(s)")
         self.unequip('weapon')
 
+        total_xp = 0
         for _ in range(amount):
             response = self.make_api_request("POST", f"/my/{self.current_character}/action/crafting", {"code": item_code})
             if not response:
                 self.logger.error(f"{self.current_character}: Failed to craft item.")
-                return
+                return -1
 
             # Log the crafting results
             details = response.get("data", {}).get("details", {})
             xp_gained = details.get("xp", 0)
+            total_xp += xp_gained
             items_crafted = details.get("items", [])
 
             character_json = response.get("data", {}).get("character", {})
@@ -369,6 +391,7 @@ class CharacterAPI:
                 self.logger.info(f"{self.current_character}: Items crafted:")
                 for item in items_crafted:
                     self.logger.info(f"{self.current_character}:   - {item['code']}: {item['quantity']}")
+        return total_xp
 
     def unequip(self, slot: str):
         """
@@ -402,6 +425,15 @@ class CharacterAPI:
             details = response.get("data", {}).get("details", {})
             xp_gained = details.get("xp", 0)
             items_gathered = details.get("items", [])
+
+            character_json = response.get("data", {}).get("character", {})
+            self.logger.info(f'weaponcraft level {character_json.get("weaponcrafting_level", 0)} {character_json.get("weaponcrafting_xp", 0)}/{character_json.get("weaponcrafting_max_xp", 0)}')
+            self.logger.info(f'gearcraft level {character_json.get("gearcrafting_level", 0)} {character_json.get("gearcrafting_xp", 0)}/{character_json.get("gearcrafting_max_xp", 0)}')
+            self.logger.info(f'jewelrycraft level {character_json.get("jewelrycrafting_level", 0)} {character_json.get("jewelrycrafting_xp", 0)}/{character_json.get("jewelrycrafting_max_xp", 0)}')
+            self.logger.info(f'woodcutting level {character_json.get("woodcutting_level", 0)} {character_json.get("woodcutting_xp", 0)}/{character_json.get("woodcutting_max_xp", 0)}')
+            self.logger.info(f'mining level {character_json.get("mining_level", 0)} {character_json.get("mining_xp", 0)}/{character_json.get("mining_max_xp", 0)}')
+            self.logger.info(f'alchemy level {character_json.get("alchemy_level", 0)} {character_json.get("alchemy_xp", 0)}/{character_json.get("alchemy_max_xp", 0)}')
+            self.logger.info(f'cooking level {character_json.get("cooking_level", 0)} {character_json.get("cooking_xp", 0)}/{character_json.get("cooking_max_xp", 0)}')
 
             self.logger.info(f"{self.current_character}: Gathered {xp_gained} XP.")
             if items_gathered:
@@ -534,11 +566,7 @@ class CharacterAPI:
 
     def fight_drop(self, quantity: int, item_code: str):
         character_data = self.get_character()
-        original_x = character_data.get('x',0)
-        original_y = character_data.get('y',0)
-
         total = 0
-        losses = 0
         while total < quantity:
             self.logger.info(f"{self.current_character}: Fight for {quantity - total} more {item_code}")
 
@@ -556,13 +584,8 @@ class CharacterAPI:
             self.logger.info(f"{self.current_character}: Fight!!!")
             response = self.make_api_request("POST", f"/my/{self.current_character}/action/fight")
             if not response:
-                losses += 1
-                self.logger.info(f"{losses} losses")
-                self.move_character(original_x, original_y)
-                if losses >= 3:
-                    self.logger.info(f"Can't beat monster to get {item_code}")
-                    return False
-                continue
+                self.logger.info(f"Can't beat monster to get {item_code}")
+                return False
 
             fight_data = response.get("data", {}).get("fight", {})
             result = fight_data.get("result", "unknown")
@@ -579,6 +602,11 @@ class CharacterAPI:
             self.logger.info(f"{self.current_character}: XP gained: {xp_gained}")
             self.logger.info(f"{self.current_character}: Gold gained: {gold_gained}")
             self.logger.info(f"{self.current_character}: Level {level} progress {xp}/{max_hp}")
+
+            if result == "loss":
+                self.logger.info(f"Can't beat monster to get {item_code}")
+                return False
+
 
             if drops:
                 self.logger.info(f"{self.current_character}: Drops:")
@@ -630,38 +658,36 @@ class CharacterAPI:
         return self.make_api_request("GET", f"/items/{code}")
 
     def fetch_maps(self, content_type: str = None, content_code: str = None) -> List[Dict]:
-        """
-        Fetches the entire map data from the ArtifactsMMO API by handling pagination.
+        cache_key = (content_type, content_code)
+        current_time = time.time()
 
-        Args:
-            content_type (str, optional): The type of content to filter by. Defaults to None.
-            content_code (str, optional): The code of the content to filter by. Defaults to None.
+        # Check if cached data is still valid
+        if cache_key in self.cache and current_time - self.cache[cache_key]["timestamp"] < self.cache_timeout:
+            return self.cache[cache_key]["data"]
 
-        Returns:
-            List[Dict]: A list of all map data entries across all pages.
-        """
         all_data = []
         page = 1
         total_pages = 1
 
+        self.logger.info("Get maps")
         while page <= total_pages:
-            # Build the query string based on provided parameters
             query_params = f"page={page}"
             if content_type:
                 query_params += f"&content_type={content_type}"
             if content_code:
                 query_params += f"&content_code={content_code}"
 
-            # Make the API request with the constructed query string
             response = self.make_api_request("GET", f"/maps?{query_params}")
             if not response:
                 break
 
-            # Append the data and update pagination details
             all_data.extend(response.get("data", []))
             total_pages = response.get("pages", 1)
             self.logger.info(f"{self.current_character}: Fetched page {page} of {total_pages}")
             page += 1
+
+        # Cache the new data with the current timestamp
+        self.cache[cache_key] = {"data": all_data, "timestamp": current_time}
 
         return all_data
 
