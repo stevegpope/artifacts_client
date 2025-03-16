@@ -1,58 +1,1054 @@
 [
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    },
-    {
-        "role": "forager",
-        "code": "birch_wood"
-    }
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "fighter",
+    "code": "ogre_eye"
+  },
+  {
+    "role": "fighter",
+    "code": "ogre_eye"
+  },
+  {
+    "role": "fighter",
+    "code": "ogre_eye"
+  },
+  {
+    "role": "fighter",
+    "code": "ogre_eye"
+  },
+  {
+    "role": "fighter",
+    "code": "ogre_eye"
+  },
+  {
+    "role": "fighter",
+    "code": "ogre_eye"
+  },
+  {
+    "role": "fighter",
+    "code": "ogre_eye"
+  },
+  {
+    "role": "fighter",
+    "code": "ogre_eye"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "trout"
+  },
+  {
+    "role": "forager",
+    "code": "trout"
+  },
+  {
+    "role": "forager",
+    "code": "trout"
+  },
+  {
+    "role": "forager",
+    "code": "trout"
+  },
+  {
+    "role": "forager",
+    "code": "trout"
+  },
+  {
+    "role": "forager",
+    "code": "trout"
+  },
+  {
+    "role": "forager",
+    "code": "trout"
+  },
+  {
+    "role": "forager",
+    "code": "trout"
+  },
+  {
+    "role": "forager",
+    "code": "trout"
+  },
+  {
+    "role": "forager",
+    "code": "trout"
+  },
+  {
+    "role": "forager",
+    "code": "small_health_potion"
+  },
+  {
+    "role": "forager",
+    "code": "small_health_potion"
+  },
+  {
+    "role": "forager",
+    "code": "small_health_potion"
+  },
+  {
+    "role": "forager",
+    "code": "small_health_potion"
+  },
+  {
+    "role": "forager",
+    "code": "small_health_potion"
+  },
+  {
+    "role": "forager",
+    "code": "small_health_potion"
+  },
+  {
+    "role": "forager",
+    "code": "small_health_potion"
+  },
+  {
+    "role": "forager",
+    "code": "small_health_potion"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "birch_wood"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  },
+  {
+    "role": "forager",
+    "code": "iron_ore"
+  }
 ]

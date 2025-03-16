@@ -283,16 +283,13 @@ def craft_gear(character: CharacterAPI, skill: str = None):
     else:
         quantity = 10
         lowest_skill = skill
-        lowest_choice_level = 1
+        skill_level = character.get_skill_level(skill)
+        lowest_choice_level = skill_level - 10
 
     item = choose_highest_item(character, lowest_skill, lowest_choice_level)
-    tries = 0
-    while not item:
-        tries += 1
-        item = choose_highest_item(character, lowest_skill, lowest_choice_level)
-        if tries == 5:
-            logger.info(f"can't get anything done here, try something else")
-            return False
+    if not item:
+        logger.info(f"cannot craft anything for {skill}, try another skill while we wait")
+        return craft_gear(character, random.choice(skills))
     
     if not craft_item(character, item, quantity):
         logger.info(f"can't craft {item.code} now, banned")
@@ -457,15 +454,12 @@ def choose_highest_item(character: CharacterAPI, skill: str, lowest_skill: int =
             if craft.get("skill") == skill:
                 item_level = craft.get("level")
                 if item_level >= skill_level:
-                    logger.info(f"zzzz item {item.code} too high level ({item_level} - {skill_level}) to craft")
                     continue
 
                 if item_level < lowest_skill:
-                    logger.info(f"zzzz item {item.code} too low level ({item_level} - {lowest_skill}) to craft")
                     continue
 
                 if item.code in banned_tasks:
-                    logger.info(f"zzzz item {item.code} banned")
                     continue
 
                 logger.info(f"craft item {item.code} level {item_level}, my skill level {skill_level}")
@@ -511,9 +505,6 @@ def gather(character: CharacterAPI, item_code: str, quantity: int):
     logger.info(f'Gather {quantity} {item_code}')
 
     item = api.get_item(item_code)
-    if item.type != 'resource':
-        logger.info(f'item is not resource to gather: {item}')
-        return False
 
     subtype = item.subtype
     if subtype == 'task':
