@@ -37,7 +37,6 @@ def fill_orders(character: CharacterAPI, role: str):
 
     # Scan for tasks, collect up to 10 matching tasks
     for index, task in enumerate(tasks, start=1):
-        logger.info(f"what about {task}")
         task_role = task.get('role', None)
         task_code = task.get('code', '')
 
@@ -82,8 +81,9 @@ def fill_orders(character: CharacterAPI, role: str):
             craft_gear(character, 'alchemy')
         elif role == 'recycler':
             recycle(character)
-        elif role == 'fisherman':
-            gather_highest(character, 'fishing')
+        elif role == 'potion_maker':
+            item = character.get_item('small_health_potion')
+            craft_item(character, item, 10)
         elif role == 'fight_looper':
             fight_same(character)
     else:
@@ -223,6 +223,9 @@ def equip_better_item(character: CharacterAPI, item_code):
                 return equip_from_bank_if_better(character, new_item, original_item, 'ring2', character_data)
             else:
                 return True
+        elif item_code == 'small_health_potion':
+            if character.withdraw_all('small_health_potion'):
+                character.equip_utility('small_health_potion')
         else:
             slot = f'{item_type}_slot'
             if not slot in slots:

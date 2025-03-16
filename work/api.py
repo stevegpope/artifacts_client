@@ -156,10 +156,11 @@ class CharacterAPI:
     
     def withdraw_all(self, code: str) -> int:
         contents = self.get_bank_contents()
+        space = self.api.char.get_inventory_space()
         for item in contents:
             if item["code"] == code:
                 quantity = item['quantity']
-                take = min(25,quantity)
+                take = min(space,quantity)
                 self.withdraw_from_bank(code,take)
                 return take
         return 0
@@ -278,15 +279,9 @@ class CharacterAPI:
 
         for item in self.api.char.inventory:
             if item.code == code:
-                quantity = item['quantity']
+                quantity = item.quantity
                 max_equip = 100 - existing_quantity
                 equip_quantity = min(quantity, max_equip)
-
-                payload = {
-                    "code": code,
-                    "slot": slot,
-                    "quantity": equip_quantity
-                }
 
                 self.logger.info(f"{self.current_character}: Equip {equip_quantity} {code} into {slot}")
                 response = self.api.actions.equip_item(code, slot, quantity)
