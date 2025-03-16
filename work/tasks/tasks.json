@@ -1,63 +1,39 @@
 [
     {
-        "role": "forager",
-        "code": "coal"
+        "role": "fighter",
+        "code": "ogre_eye"
     },
     {
-        "role": "forager",
-        "code": "coal"
+        "role": "fighter",
+        "code": "ogre_eye"
     },
     {
-        "role": "forager",
-        "code": "coal"
+        "role": "fighter",
+        "code": "ogre_eye"
     },
     {
-        "role": "forager",
-        "code": "coal"
+        "role": "fighter",
+        "code": "ogre_eye"
     },
     {
-        "role": "forager",
-        "code": "coal"
+        "role": "fighter",
+        "code": "ogre_skin"
     },
     {
-        "role": "forager",
-        "code": "coal"
+        "role": "fighter",
+        "code": "ogre_skin"
     },
     {
-        "role": "forager",
-        "code": "coal"
+        "role": "fighter",
+        "code": "ogre_skin"
     },
     {
-        "role": "forager",
-        "code": "coal"
+        "role": "fighter",
+        "code": "green_slimeball"
     },
     {
-        "role": "forager",
-        "code": "coal"
-    },
-    {
-        "role": "forager",
-        "code": "coal"
-    },
-    {
-        "role": "forager",
-        "code": "coal"
-    },
-    {
-        "role": "forager",
-        "code": "coal"
-    },
-    {
-        "role": "forager",
-        "code": "coal"
-    },
-    {
-        "role": "forager",
-        "code": "coal"
-    },
-    {
-        "role": "forager",
-        "code": "coal"
+        "role": "fighter",
+        "code": "green_slimeball"
     },
     {
         "role": "fighter",

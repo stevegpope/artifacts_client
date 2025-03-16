@@ -110,14 +110,24 @@ def recycle(character: CharacterAPI):
     character.unequip('weapon')
     found_something = False
     for bankitem in contents:
-        item = api.get_item(bankitem.code)
-        level = item.get('level',0)
-        if level > 10:
-            continue
-        craft = item.get('craft',None)
+        item = api.get_item(bankitem['code'])
+        craft = item.craft
         if not craft:
             continue
-        skill = craft.get('skill')
+        if craft['level'] > 15:
+            continue
+        skill = craft['skill']
+        requirements = craft['items']
+        needs_crystal = False
+        for requirement in requirements:
+            if requirement['code'] == 'jasper_crystal':
+                needs_crystal = True
+                break
+
+        if needs_crystal:
+            logger.info(f"{item.code} requires crystal, do not recycle")
+            continue
+
         skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting']
         if skill not in skills:
             continue
@@ -131,8 +141,8 @@ def recycle(character: CharacterAPI):
         character.deposit_all_inventory_to_bank()
         found_something = True
     if not found_something:
-        logger.info(f"nothing to recycle, go make something to recycle")
-        craft_gear(character)
+        logger.info(f"nothing to recycle, quit")
+        exit(0)
 
 def gather_highest(character: CharacterAPI, skill: str = None):
     skills = ['mining', 'woodcutting', 'fishing','alchemy']
@@ -298,9 +308,10 @@ def craft_orders(character: CharacterAPI):
     orders = current_orders.read_tasks()
     for code in orders:
         item = character.get_item(code)
-        if item and item.craft and has_requirements(character, item.craft['requirements'], ordered=True):
+        logger.info(f"craft order {item}")
+        if item and item.craft and has_requirements(character, item.craft['items'], ordered=True) == 0:
             logger.info(f"enough to go craft order {code}")
-            logger.info(f"requirements met, go craft {code}")
+            logger.info(f"craft_orders requirements met, go craft {code}")
             skill = item.craft['skill']
             shop_x,shop_y = character.find_closest_content('workshop',skill)
             character.move_character(shop_x, shop_y)
@@ -363,7 +374,7 @@ def craft_item(character: CharacterAPI, item: Item, quantity: int = 1):
     character.deposit_all_inventory_to_bank()
     return xp != -1
 
-def has_requirements(character: CharacterAPI, requirements, ordered: bool, quantity: int):
+def has_requirements(character: CharacterAPI, requirements, ordered: bool, quantity: int = 1):
     need_something = 0
     bank_contents = api.get_bank_contents()
     for requirement in requirements:
