@@ -27,9 +27,6 @@ class TaskQueue:
             json.dump(tasks, file, indent=4)  # Serialize list of dictionaries to JSON
 
     def create_task(self, task):
-        """Add a new task (dictionary) to the end of the queue."""
-        if not isinstance(task, dict):
-            raise ValueError("Task must be a dictionary.")
         tasks = self._read_tasks()
         tasks.append(task)
         self._write_tasks(tasks)
@@ -61,6 +58,16 @@ class TaskQueue:
             print(f"Task deleted: {json.dumps(deleted_task, indent=4)}")
         else:
             print(f"Invalid task index: {task_index}")
+
+    def delete_entry(self, entry):
+        """Delete a specific entry."""
+        tasks = self._read_tasks()
+        for i in range(len(tasks)):
+            if tasks[i] == entry:
+                deleted_task = tasks.pop(i)
+                self._write_tasks(tasks)
+                print(f"Task deleted: {json.dumps(deleted_task, indent=4)}")
+                return
 
     def clear_tasks(self):
         """Clear all tasks from the queue."""
