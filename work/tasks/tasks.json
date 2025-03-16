@@ -1,54 +1,58 @@
 [
     {
-        "role": "fighter",
-        "code": "ogre_eye"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "ogre_eye"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "ogre_eye"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "ogre_eye"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "ogre_skin"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "ogre_skin"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "ogre_skin"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "green_slimeball"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "green_slimeball"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "ogre_eye"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "ogre_eye"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "ogre_eye"
+        "role": "forager",
+        "code": "birch_wood"
     },
     {
-        "role": "fighter",
-        "code": "ogre_eye"
+        "role": "forager",
+        "code": "birch_wood"
+    },
+    {
+        "role": "forager",
+        "code": "birch_wood"
     }
 ]

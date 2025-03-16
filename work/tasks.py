@@ -12,7 +12,6 @@ character: str
 resources: List[Dict]
 task_queue: TaskQueue
 m_role: str
-banned_tasks = []
 current_orders = TaskQueue
 banned_orders = TaskQueue
 
@@ -27,7 +26,6 @@ def setup_tasks(m_logger, m_character, role, m_api):
     banned_orders = TaskQueue(f"C:\\Users\\sarah\\Desktop\\code\\artifacts\\work\\tasks\\banned_orders_{m_character}.json")
 
 def fill_orders(character: CharacterAPI, role: str):
-    global banned_tasks
     character.deposit_all_inventory_to_bank()
     tasks = task_queue.read_tasks()
     logger.info(f"Fill orders for {role}")
@@ -35,6 +33,7 @@ def fill_orders(character: CharacterAPI, role: str):
     chosen_tasks = []
     chosen_code = None
     tasks_to_delete = []  # Track indices to remove after processing
+    banned_tasks = banned_orders.read_tasks()
 
     # Scan for tasks, collect up to 10 matching tasks
     for index, task in enumerate(tasks, start=1):
@@ -93,8 +92,8 @@ def fill_orders(character: CharacterAPI, role: str):
         logger.info(f"Filling order for {chosen_code} - {task_count} tasks")
         if not gather(character, chosen_code, task_count):
             logger.info(f'cannot gather {chosen_code}!, re-insert tasks')
-            banned_tasks.append(chosen_code)
-            logger.info(f'banned tasks after add: {banned_tasks}')
+            banned_orders.create_task(chosen_code)
+            logger.info(f'banned tasks after add: {banned_orders.read_tasks()}')
             for task in chosen_tasks:
                 task_queue.create_task(task)
     return True
@@ -275,10 +274,12 @@ def craft_gear(character: CharacterAPI, skill: str = None):
         quantity = 1
         for skill in skills:
             skill_level = character.get_skill_level(skill)
+            logger.info(f"skill {skill} level {skill_level}")
             if skill_level < lowest_level:
                 lowest_level = skill_level
                 lowest_skill = skill
                 lowest_choice_level = skill_level - 10
+                logger.info(f"skill {skill} level {skill_level}, lowest allowed {lowest_choice_level}")
     else:
         quantity = 10
         lowest_skill = skill
@@ -446,6 +447,7 @@ def choose_highest_item(character: CharacterAPI, skill: str, lowest_skill: int =
     # Get all craftable items at or below the character's skill level
     craftable_items = []
     items = api.all_items()
+    banned_tasks = banned_orders.read_tasks()
 
     for item in items:
         item: Item
@@ -454,11 +456,20 @@ def choose_highest_item(character: CharacterAPI, skill: str, lowest_skill: int =
         if craft:
             if craft.get("skill") == skill:
                 item_level = craft.get("level")
-                if not item_level: 
+                if item_level >= skill_level:
+                    logger.info(f"zzzz item {item.code} too high level ({item_level} - {skill_level}) to craft")
                     continue
-                if item_level <= skill_level and item.code not in banned_orders.read_tasks() and item_level >= lowest_skill:
-                    logger.info(f"craft item {item.code} level {item_level}, my skill level {skill_level}")
-                    craftable_items.append(item)
+
+                if item_level < lowest_skill:
+                    logger.info(f"zzzz item {item.code} too low level ({item_level} - {lowest_skill}) to craft")
+                    continue
+
+                if item.code in banned_tasks:
+                    logger.info(f"zzzz item {item.code} banned")
+                    continue
+
+                logger.info(f"craft item {item.code} level {item_level}, my skill level {skill_level}")
+                craftable_items.append(item)
 
     if not craftable_items:
         logger.info(f'cannot craft anything for {skill}')
@@ -517,6 +528,7 @@ def gather(character: CharacterAPI, item_code: str, quantity: int):
             logger.info(f"cannot fight to get {item_code}")
             banned_orders.create_task(item_code)
             return False
+        return True
 
     if item.craft != None:
         logger.info(f'to gather {item_code} need to craft it')
@@ -679,6 +691,7 @@ def handle_items_task(character: CharacterAPI, task_data: Dict):
             logger.info(f"Got {current_batch} from the bank, go exchange")
         else:
             gather(character, task_data['code'], current_batch)
+            character.withdraw_from_bank(task_data['code'],current_batch)
         
         x, y = character.find_closest_content('tasks_master','items')
         character.move_character(x, y)

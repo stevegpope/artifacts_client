@@ -75,6 +75,9 @@ class CharacterAPI:
                 continue
 
             self.api.actions.bank_deposit_item(code, quantity)
+            if self.api.char.gold > 0:
+                self.logger.info(f"deposit {self.api.char.gold} gold")
+                self.api.actions.bank_deposit_gold(self.api.char.gold)
 
         self.logger.info(f"{self.current_character}: All items deposited into the bank.")
 
@@ -83,14 +86,14 @@ class CharacterAPI:
         level = self.api.char.level
         target_monster_level = level - 10
 
-        monsters = self.api.monsters.get(min_level=target_monster_level)
+        monsters = self.api.monsters.get(min_level=target_monster_level,max_level=level-8)
         if not monsters:
             self.logger.info('No monsters found within the level range')
             return None
         
         # Find the monster closest to target_monster_level
         closest_monster = min(monsters, key=lambda x: abs(x.level - target_monster_level))
-        self.logger.info(f'Closest monster found: {closest_monster.name} (Level {closest_monster.level})')
+        self.logger.info(f'Closest monster found: {closest_monster}')
         
         x,y = self.find_closest_content('monster', closest_monster.code)
         self.move_character(x, y)
@@ -113,6 +116,7 @@ class CharacterAPI:
 
     def find_closest_content(self, content_type: str, content_code: str):
         maps_data = self.api.maps.get(content_code=content_code, content_type=content_type)
+        self.logger.info(f"closest {content_code} in {maps_data}")
 
         char_x = self.api.char.pos.x
         char_y = self.api.char.pos.y
@@ -124,6 +128,9 @@ class CharacterAPI:
         
         # Iterate through all map tiles
         for tile in maps_data:
+            if tile.content_code != content_code:
+                continue
+
             # Calculate the Euclidean distance between the character and the tile
             distance = math.sqrt((tile.x - char_x)**2 + (tile.y - char_y)**2)
             
@@ -380,7 +387,12 @@ class CharacterAPI:
         gathered_quantity = 0
 
         while gathered_quantity < target_quantity:
-            response = self.api.actions.gather()
+            response = None
+            try:
+                response = self.api.actions.gather()
+            except:
+                pass
+
             if not response:
                 return False
 
