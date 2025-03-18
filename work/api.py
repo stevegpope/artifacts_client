@@ -320,7 +320,9 @@ class CharacterAPI:
         self.logger.info(f"{self.current_character}: Recycle {quantity} {code}")
         response = self.api.actions.recycle_item(code, quantity)
         if response:
-            self.logger.info(f"{self.current_character}: Successfully recycled {quantity} of {code}.")
+            details = response.get("data", {}).get("details", {})
+            xp_gained = details.get("xp", 0)
+            self.logger.info(f"{self.current_character}: Successfully recycled {quantity} of {code}, got {xp_gained} xp.")
             return response
         else:
             self.logger.error(f"{self.current_character}: Failed to recycle")

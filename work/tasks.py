@@ -107,8 +107,6 @@ def recycle(character: CharacterAPI):
         craft = item.craft
         if not craft:
             continue
-        if craft['level'] > 15:
-            continue
         skill = craft['skill']
         requirements = craft['items']
         needs_crystal = False
@@ -124,18 +122,24 @@ def recycle(character: CharacterAPI):
         skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting']
         if skill not in skills:
             continue
-        shop_x,shop_y = character.find_closest_content('workshop',skill)
-        quantity = character.withdraw_all(item.code)
+        if craft['level'] > 15:
+            quantity = max(bankitem['quantity'] - 5,0)
+            if quantity > 0:
+                character.withdraw_from_bank(item.code, quantity)
+        else:
+            quantity = character.withdraw_all(item.code)
         if quantity == 0:
             continue
+        shop_x,shop_y = character.find_closest_content('workshop',skill)
         character.move_character(shop_x,shop_y)
         character.recycle(item.code,quantity)
+        x,y = character.find_closest_content('bank','bank')
         character.move_character(x,y)
         character.deposit_all_inventory_to_bank()
         found_something = True
     if not found_something:
         logger.info(f"nothing to recycle, quit")
-        exit(0)
+        return False
 
 def gather_highest(character: CharacterAPI, skill: str = None):
     skills = ['mining', 'woodcutting', 'fishing','alchemy']
@@ -236,8 +240,9 @@ def craft_orders(character: CharacterAPI):
             character.deposit_all_inventory_to_bank()
             current_orders.delete_entry(code)
     
-    logger.info(f"craft_orders done checking current orders, go make something else")
+    logger.info(f"craft_orders done checking current orders, go recycle something")
     craft_gear(character)
+    recycle(character)
 
 
 def craft_item(character: CharacterAPI, item: Item, quantity: int = 1):
@@ -341,7 +346,7 @@ def order_items(character: CharacterAPI, item_code: str, quantity: int):
     
     if item.craft != None:
         logger.info(f'to gather {item_code} we need to craft it')
-        batch_size = 3
+        batch_size = 5
         while quantity > 0:
             current_batch = min(batch_size, quantity)
             if not craft_item(character, item, current_batch):
