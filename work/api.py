@@ -81,6 +81,129 @@ class CharacterAPI:
 
         self.logger.info(f"{self.current_character}: All items deposited into the bank.")
 
+    def gear_up(self, monster: Monster):
+        self.logger.info(f"gear_up for {monster}")
+        x,y = self.find_closest_content('bank','bank')
+        self.move_character(x,y)
+        self.rest()
+        contents = self.get_bank_contents()
+
+        # Determine the best element for attack (choose the one with the highest attack value)
+        defense_elements = {
+            "air": monster.res_air,
+            "earth": monster.res_earth,
+            "fire": monster.res_fire,
+            "water": monster.res_water
+        }
+        lowest_defense_element = min(defense_elements, key=defense_elements.get)
+
+        # Determine the best element for defense (choose the one with the lowest resistance value)
+        attack_elements = {
+            "air": monster.attack_air,
+            "earth": monster.attack_earth,
+            "fire": monster.attack_fire,
+            "water": monster.attack_water
+        }
+        best_attack_element = max(attack_elements, key=attack_elements.get)
+
+        print(f"{monster.code} highest attack: {best_attack_element}")
+        print(f"{monster.code} lowest defense: {lowest_defense_element}")
+
+        for item_dict in contents:
+            self.equip_better_item(item_dict['code'], best_attack_element, lowest_defense_element)
+            item = self.get_item(item_dict['code'])
+            if item.type == 'consumable' and item.subtype == 'food':
+                self.logger.info(f"load up on food {item.code}")
+                self.withdraw_all(item.code)
+
+    def equip_better_item(self, item_code, best_attack_element: str, lowest_defense_element: str):
+        new_item = self.get_item(item_code)
+        item_type = new_item.type
+        item_level = new_item.level
+        if not item_level:
+            if new_item.craft:
+                item_level = new_item.craft['level']
+
+        character_data = self.get_character()
+
+        if item_level:
+            if item_level > character_data.level:
+                self.logger.info(f"equip_better_item {item_code} is too high level ({item_level})")
+                return False
+        
+        slots = ['weapon_slot','rune_slot','shield_slot','helmet_slot','body_armor_slot','leg_armor_slot','boots_slot','ring1_slot','ring2_slot','amulet_slot','bag_slot']
+
+        if item_type:
+            if item_type == 'ring':
+                original_item = character_data.ring1_slot
+                if not self.equip_from_bank_if_better(new_item, original_item, 'ring1', best_attack_element, lowest_defense_element):
+                    original_item = character_data.ring2_slot
+                    return self.equip_from_bank_if_better(new_item, original_item, 'ring2', best_attack_element, lowest_defense_element)
+                else:
+                    return True
+            elif item_code == 'small_health_potion':
+                if self.withdraw_all('small_health_potion'):
+                    self.equip_utility('small_health_potion')
+            else:
+                slot = f'{item_type}_slot'
+                if not slot in slots:
+                    return False
+                try:
+                    original_item = getattr(character_data, slot)
+                except AttributeError:
+                    print(f"slot '{slot}' not found.")
+                    return
+
+                return self.equip_from_bank_if_better(new_item, original_item, item_type, best_attack_element, lowest_defense_element)
+        return False
+
+    def equip_from_bank_if_better(self, new_item: Item, original_item, slot, best_attack_element: str, lowest_defense_element: str):
+        if not original_item:
+            self.logger.info(f"equip_from_bank_if_better {new_item.code} is better than nothing, changing {slot}")
+            self.withdraw_from_bank(new_item.code,1)
+            self.unequip(slot)
+            self.equip(new_item.code,slot)
+            return True
+        else:
+            original: Item = self.get_item(original_item)
+            original_total = 0
+            for effect in original.effects:
+                if effect.code == f"attack_{lowest_defense_element}":
+                    original_total += effect.attributes['value']
+                if effect.code == f"dmg_{lowest_defense_element}":
+                    original_total += effect.attributes['value']
+                elif effect.code == f"res_{best_attack_element}":
+                    original_total += effect.attributes['value']
+                elif effect.code == "hp":
+                    original_total += effect.attributes['value']
+                elif effect.code == "dmg":
+                    original_total += effect.attributes['value']
+
+            # Calculate the total value for the new item
+            new_total = 0
+            for effect in new_item.effects:
+                if effect.code == f"dmg_{lowest_defense_element}":
+                    new_total += effect.attributes['value']
+                if effect.code == f"attack_{lowest_defense_element}":
+                    new_total += effect.attributes['value']
+                elif effect.code == f"res_{best_attack_element}":
+                    new_total += effect.attributes['value']
+                elif effect.code == "hp":
+                    new_total += effect.attributes['value']
+                elif effect.code == "dmg":
+                    new_total += effect.attributes['value']
+
+            # Compare the totals and equip the new item if it's better
+            if new_total > original_total:
+                self.logger.info(f"equip_from_bank_if_better {new_item.code} has a higher total value ({new_total}) than {original.code} ({original_total}), equipping {slot}")
+                self.unequip(slot)
+                self.withdraw_from_bank(new_item.code, 1)
+                self.equip(new_item.code, slot)
+                return True
+            else:
+                self.logger.info(f"equip_from_bank_if_better \n\n{new_item}\n\n has a lower total value ({new_total}) than \n\n{original} \n\n({original_total}), not equipping {slot}")
+                return False
+
     def fight_xp(self):
         self.logger.info('Fight loop')
         level = self.api.char.level
@@ -95,6 +218,8 @@ class CharacterAPI:
         closest_monster = min(monsters, key=lambda x: abs(x.level - target_monster_level))
         self.logger.info(f'Closest monster found: {closest_monster}')
         
+        self.gear_up(closest_monster)
+
         x,y = self.find_closest_content('monster', closest_monster.code)
         self.move_character(x, y)
 
@@ -159,7 +284,7 @@ class CharacterAPI:
         space = self.api.char.get_inventory_space()
         for item in contents:
             if item["code"] == code:
-                quantity = item['quantity']
+                quantity = min(item['quantity'],100)
                 take = min(space,quantity)
                 self.withdraw_from_bank(code,take)
                 return take
@@ -167,6 +292,10 @@ class CharacterAPI:
 
     def withdraw_from_bank(self, code: str, quantity: int) -> Optional[Dict]:
         try:
+            if quantity > 100:
+                self.logger.info(f"withdraw_from_bank too much {code} ordered {quantity}")
+                exit(1)
+                
             response = self.api.actions.bank_withdraw_item(code, quantity)
             if response:
                 self.logger.info(f"{self.current_character}: Successfully withdrew {quantity} of {code} from the bank")
@@ -255,11 +384,6 @@ class CharacterAPI:
             self.logger.info(f"{self.current_character}: Successfully completed task: {response}")
 
     def trade_task_items(self, code: str, quantity: int):
-        payload = {
-            "code": code,
-            "quantity": quantity
-        }
-
         self.logger.info(f"{self.current_character}: Trade in {quantity} {code}")
         response = self.api.actions.taskmaster_trade_task(code, quantity)
         if response:
@@ -283,8 +407,11 @@ class CharacterAPI:
                 max_equip = 100 - existing_quantity
                 equip_quantity = min(quantity, max_equip)
 
+                if equip_quantity == 0:
+                    return
+
                 self.logger.info(f"{self.current_character}: Equip {equip_quantity} {code} into {slot}")
-                response = self.api.actions.equip_item(code, slot, quantity)
+                response = self.api.actions.equip_item(code, slot, equip_quantity)
                 if response:
                     self.logger.info(f"{self.current_character}: Successfully equipped {code} into {slot}.")
 
@@ -431,22 +558,10 @@ class CharacterAPI:
                 return
             
             self.logger.info(f"{self.current_character}: Resting...")
-            response = self.api.actions.rest()
-            if not response:
-                return
-            
-            data = response.get("data", None)
-            if data:
-                character_data = data.get("data", {})
-                hp = character_data.get("hp", 0)
-                max_hp = character_data.get("max_hp", 0)
-                hp_restored = response.get("data", {}).get("hp_restored", 0)
-
-                self.logger.info(f"{self.current_character}: Restored {hp_restored} HP. Current HP: {hp}/{max_hp}")
-
-                if hp >= max_hp:
-                    self.logger.info(f"{self.current_character}: Character HP is fully restored.")
-                    return
+            if self.api.char.hp != self.api.char.max_hp:
+                self.api.actions.rest()
+                self.logger.info(f"{self.current_character}: Rested. HP: {self.api.char.hp}/{self.api.char.max_hp}")
+            return
             
     def eat(self):
         for inventory_item in self.api.char.inventory:
@@ -513,7 +628,8 @@ class CharacterAPI:
 
     def fight_drop(self, quantity: int, item_code: str):
         total = 0
-        while total < quantity:
+        losses = 0
+        while total < quantity and losses < 3:
             self.logger.info(f"{self.current_character}: Fight for {quantity - total} more {item_code}")
 
             current_hp = self.api.char.hp
@@ -524,7 +640,6 @@ class CharacterAPI:
                 if (self.eat()):
                     self.logger.info("Ate food, no rest for the wicked")
                 else:
-                    self.logger.info(f"{self.current_character}: Health is below 50%. Resting...")
                     self.rest()
 
             self.logger.info(f"{self.current_character}: Fight!!!")
@@ -551,7 +666,7 @@ class CharacterAPI:
 
             if result == "loss":
                 self.logger.info(f"Can't beat monster to get {item_code}")
-                return False
+                losses += 1
 
             if drops:
                 self.logger.info(f"{self.current_character}: Drops:")
