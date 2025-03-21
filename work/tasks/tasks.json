@@ -1,30 +1,102 @@
 [
     {
-        "role": "fighter",
-        "code": "ogre_eye"
+        "role": "forager",
+        "code": "bass"
+    },
+    {
+        "role": "forager",
+        "code": "bass"
+    },
+    {
+        "role": "forager",
+        "code": "bass"
+    },
+    {
+        "role": "forager",
+        "code": "bass"
+    },
+    {
+        "role": "forager",
+        "code": "bass"
+    },
+    {
+        "role": "forager",
+        "code": "strangold"
+    },
+    {
+        "role": "forager",
+        "code": "strangold"
+    },
+    {
+        "role": "forager",
+        "code": "strangold"
+    },
+    {
+        "role": "forager",
+        "code": "strangold"
+    },
+    {
+        "role": "forager",
+        "code": "strangold"
+    },
+    {
+        "role": "forager",
+        "code": "strangold"
+    },
+    {
+        "role": "forager",
+        "code": "strangold"
+    },
+    {
+        "role": "forager",
+        "code": "strangold"
+    },
+    {
+        "role": "forager",
+        "code": "strangold"
+    },
+    {
+        "role": "forager",
+        "code": "strangold"
+    },
+    {
+        "role": "forager",
+        "code": "maple_sap"
+    },
+    {
+        "role": "forager",
+        "code": "maple_sap"
+    },
+    {
+        "role": "forager",
+        "code": "maple_sap"
+    },
+    {
+        "role": "forager",
+        "code": "maple_sap"
+    },
+    {
+        "role": "forager",
+        "code": "maple_sap"
     },
     {
         "role": "fighter",
-        "code": "ogre_eye"
+        "code": "yellow_slimeball"
     },
     {
         "role": "fighter",
-        "code": "ogre_eye"
+        "code": "yellow_slimeball"
     },
     {
         "role": "fighter",
-        "code": "ogre_eye"
+        "code": "yellow_slimeball"
     },
     {
         "role": "fighter",
-        "code": "ogre_skin"
+        "code": "yellow_slimeball"
     },
     {
         "role": "fighter",
-        "code": "ogre_skin"
-    },
-    {
-        "role": "fighter",
-        "code": "ogre_skin"
+        "code": "yellow_slimeball"
     }
 ]

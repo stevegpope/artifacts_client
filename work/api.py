@@ -74,7 +74,13 @@ class CharacterAPI:
             if not code or quantity <= 0:
                 continue
 
-            self.api.actions.bank_deposit_item(code, quantity)
+            try:
+                self.api.actions.bank_deposit_item(code, quantity)
+            except:
+                x,y = self.find_closest_content('bank','bank')
+                self.move_character(x,y)
+                self.api.actions.bank_deposit_item(code, quantity)
+
             if self.api.char.gold > 0:
                 self.logger.info(f"deposit {self.api.char.gold} gold")
                 self.api.actions.bank_deposit_gold(self.api.char.gold)
@@ -429,7 +435,7 @@ class CharacterAPI:
         try:
             response = self.api.actions.equip_item(code, slot)
         except:
-            pass
+            return False
 
         if response:
             self.logger.info(f"{self.current_character}: Successfully equipped {code} into {slot}.")
@@ -631,6 +637,8 @@ class CharacterAPI:
     def fight_drop(self, quantity: int, item_code: str):
         total = 0
         losses = 0
+        start_x = self.api.char.pos.x
+        start_y = self.api.char.pos.y
         while total < quantity and losses < 3:
             self.logger.info(f"{self.current_character}: Fight for {quantity - total} more {item_code}")
 
@@ -638,7 +646,7 @@ class CharacterAPI:
             max_hp = self.api.char.max_hp
             self.logger.info(f"{self.current_character}: Current hp {current_hp}, Max hp {max_hp}")
 
-            if current_hp / max_hp:
+            if current_hp / max_hp * .75:
                 if (self.eat()):
                     self.logger.info("Ate food, no rest for the wicked")
                 else:
@@ -668,6 +676,7 @@ class CharacterAPI:
 
             if result == "loss":
                 self.logger.info(f"Can't beat monster to get {item_code}")
+                self.move_character(start_x, start_y)
                 losses += 1
 
             if drops:
@@ -771,10 +780,10 @@ class CharacterAPI:
                     except ValueError:
                         self.logger.error(f"{self.current_character}: Failed to parse the response body as JSON.")
                 elif e.response.status_code > 400 and e.response.status_code < 500:
-                    self.logger.info(f"{self.current_character}: No action taken trying to {context}. Code {e.response.status_code}")
+                    self.logger.info(f"{self.current_character}: No action taken. Code {e.response.status_code}")
                 else:
                     self.logger.error(f"{self.current_character}: HTTP error occurred: {e}")
         else:
-            self.logger.error(f"{self.current_character}: An error occurred during {context}: {e}")
+            self.logger.error(f"{self.current_character}: An error occurred: {e}")
 
         return False
