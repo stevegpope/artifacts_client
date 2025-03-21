@@ -26,6 +26,7 @@ def setup_tasks(m_logger, m_character, role, m_api):
     banned_orders = TaskQueue(f"C:\\Users\\sarah\\Desktop\\code\\artifacts\\work\\tasks\\banned_orders_{m_character}.json")
 
 def fill_orders(character: CharacterAPI, role: str):
+    character.unequip('weapon')
     character.deposit_all_inventory_to_bank()
     tasks = task_queue.read_tasks()
     logger.info(f"Fill orders for {role}")
@@ -44,7 +45,7 @@ def fill_orders(character: CharacterAPI, role: str):
             if task_code in banned_tasks:
                 continue
             match = role == task_role
-            if match or role == 'crafter' or role == 'forager': # crafter and forager got skillz
+            if match or role == 'crafter' or role == 'forager' or role == 'tasker':
                 logger.info(f'first banned tasks: {banned_tasks}, code {task_code}')
                 chosen_tasks.append(task)
                 chosen_code = task_code
@@ -71,7 +72,9 @@ def fill_orders(character: CharacterAPI, role: str):
             craft_orders(character)
             return True
         elif role == 'tasker':
-            do_tasks(character)
+            do_tasks(character, fight_tasker=False)
+        elif role == 'fight_tasker':
+            do_tasks(character, fight_tasker=True)
         elif role == 'forager':
             gather_highest(character)
         elif role == 'chef':
@@ -85,6 +88,9 @@ def fill_orders(character: CharacterAPI, role: str):
             gather_highest(character, 'woodcutting')
         elif role == 'alchemist':
             craft_gear(character, 'alchemy')
+            fill_orders(character, 'forager')
+        elif role == 'gudgeon':
+            gather(character, 'gudgeon', 100)
     else:
         # Perform the gathered tasks
         task_count = len(chosen_tasks)
@@ -102,7 +108,6 @@ def recycle(character: CharacterAPI):
     x,y = character.find_closest_content('bank','bank')
     character.move_character(x,y)
     contents = character.get_bank_contents()
-    character.unequip('weapon')
     found_something = False
     for bankitem in contents:
         item = api.get_item(bankitem['code'])
@@ -289,7 +294,7 @@ def craft_item(character: CharacterAPI, item: Item, quantity: int = 1):
     xp = character.craft(item.code,quantity)
     logger.info(f"craft_item craft item result {xp}")
     character.move_character(bank_x,bank_y)
-    character.deposit_all_inventory_to_bank()
+    character.deposit_to_bank(item.code, quantity)
     return xp != -1
 
 def has_requirements(character: CharacterAPI, item_code: str, requirements, ordered: bool, quantity: int = 1):
@@ -312,6 +317,8 @@ def has_requirements(character: CharacterAPI, item_code: str, requirements, orde
                     need_something = 2
     if need_something == 0:
         logger.info(f"has_requirements Have all the stuff in the bank to make {item_code}, get it out")
+        x,y = character.find_closest_content('bank','bank')
+        character.move_character(x,y)
         for requirement in requirements:
             required_quantity = requirement['quantity'] * quantity
             if (character.withdraw_from_bank(requirement['code'],required_quantity)):
@@ -386,6 +393,7 @@ def choose_lowest_item(character: CharacterAPI, skill: str, lowest_skill: int = 
                     continue
 
                 if item.code in banned_tasks:
+                    logger.info(f"skip {item.code}, banned")
                     continue
 
                 logger.info(f"craft item {item.code} level {item_level}, my skill level {skill_level}")
@@ -434,7 +442,7 @@ def gather(character: CharacterAPI, item_code: str, quantity: int):
 
     if item.craft != None:
         logger.info(f'to gather {item_code} need to craft it')
-        batch_size = 5
+        batch_size = 10
         while quantity > 0:
             current_batch = min(batch_size, quantity)
             if not craft_item(character, item, current_batch):
@@ -531,25 +539,9 @@ def hunt_for_items(character, item_code, quantity):
                         return False
                     return True
 
-def make_gear(character: CharacterAPI):
-    bank_x,bank_y = character.find_closest_content('bank','bank')
-    character.move_character(bank_x,bank_y)
-    character.withdraw_from_bank('feather',2)
-    character.withdraw_from_bank('copper',5)
-    x,y = character.find_closest_content('workshop', 'gearcrafting')
-    character.move_character(x,y)
-    character.unequip('weapon')
-    character.craft('copper_legs_armor',1)
-    character.move_character(bank_x,bank_y)
-    character.deposit_all_inventory_to_bank()
-
-def do_tasks(character: CharacterAPI):
-    task = character.choose_task()
+def do_tasks(character: CharacterAPI, fight_tasker: bool = False):
+    task = character.choose_task(fight_tasker)
     handle_task(character, task)
-
-def find_taskmaster():
-    logger.info("taskmaster at (4,13)")
-    return 4,13
 
 def handle_monsters_task(character: CharacterAPI, task_data: Dict):
     logger.info(f"Handling monsters task: {task_data}")
@@ -563,9 +555,7 @@ def handle_monsters_task(character: CharacterAPI, task_data: Dict):
     total = task_data['total']
     combats = total - progress
 
-    if combats > 0:
-        # Take as many health potions with us as possible
-        logger.info("Get some potions for fighting")
+    while combats > 0:
         x,y = character.find_closest_content('bank','bank')
         character.move_character(x,y)
         monster = character.api.monsters.get(code=task_data['code'])
@@ -574,9 +564,11 @@ def handle_monsters_task(character: CharacterAPI, task_data: Dict):
         # Find the closest monster and move to its location
         x, y = character.find_closest_content("monster", task_data['code'])
         character.move_character(x, y)
-        character.fight(combats)
+        fights = min(combats,50)
+        character.fight(fights)
+        combats -= fights
     
-    x, y = find_taskmaster()
+    x, y = api.find_taskmaster(character, fight_task=True)
     character.move_character(x, y)
     character.complete_task()
 
@@ -591,7 +583,7 @@ def handle_items_task(character: CharacterAPI, task_data: Dict):
     
     total = task_data['total']
     quantity = total - progress 
-    batch_size = 50
+    batch_size = 10
 
     while quantity > 0:
         current_batch = min(batch_size, quantity)
