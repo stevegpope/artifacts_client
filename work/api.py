@@ -208,6 +208,8 @@ class CharacterAPI:
                     original_total += effect.attributes['value']/2
                 elif effect.code.startswith('dmg'):
                     original_total += effect.attributes['value']/2
+                elif effect.code.startswith('res'):
+                    original_total += effect.attributes['value']/2
 
             # Calculate the total value for the new item
             new_total = 0
@@ -227,6 +229,8 @@ class CharacterAPI:
                 elif effect.code.startswith('attack'): # other attack values at half, they all count
                     new_total += effect.attributes['value']/2
                 elif effect.code.startswith('dmg'):
+                    new_total += effect.attributes['value']/2
+                elif effect.code.startswith('res'):
                     new_total += effect.attributes['value']/2
 
             # Compare the totals and equip the new item if it's better
@@ -446,9 +450,12 @@ class CharacterAPI:
                     return
 
                 self.logger.info(f"{self.current_character}: Equip {equip_quantity} {code} into {slot}")
-                response = self.api.actions.equip_item(code, slot, equip_quantity)
-                if response:
-                    self.logger.info(f"{self.current_character}: Successfully equipped {code} into {slot}.")
+                try:
+                    response = self.api.actions.equip_item(code, slot, equip_quantity)
+                    if response:
+                        self.logger.info(f"{self.current_character}: Successfully equipped {code} into {slot}.")
+                except:
+                    pass
 
     def equip(self, code: str, slot: str):
         """

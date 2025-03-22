@@ -568,7 +568,7 @@ def handle_monsters_task(character: CharacterAPI, task_data: Dict):
         character.fight(fights)
         combats -= fights
     
-    x, y = api.find_taskmaster(character, fight_task=True)
+    x, y = character.find_taskmaster(fight_task=True)
     character.move_character(x, y)
     character.complete_task()
 
