@@ -25,7 +25,20 @@ class CharacterAPI:
         logger.setLevel("DEBUG")
 
     def get_item(self, item_code) -> Item: 
-        return self.api.items.get(item_code)
+        item = self.api.items.get(item_code)
+        item_level = 1
+        try:
+            if item.level > 0:
+                item_level = item.level
+        except:
+            if item.craft is not None:
+                item_level = item.craft.get('level',1)
+            elif item.code == 'old_boots': # not set
+                item_level = 20
+            elif item.code == 'wooden_club': # not set
+                item_level = 25
+        item.level = item_level
+        return item
     
     def all_items(self) -> List[Item]:
         return self.parse_json_fields(self.api.items.get(code=None))
@@ -88,169 +101,280 @@ class CharacterAPI:
         self.logger.info(f"{self.current_character}: All items deposited into the bank.")
 
     def gear_up(self, monster: Monster):
-        self.logger.info(f"gear_up for {monster}, go to bank")
         x,y = self.find_closest_content('bank','bank')
         self.move_character(x,y)
-        self.logger.info(f"gear_up for {monster}, rest up")
         self.rest()
-        contents = self.get_bank_contents()
-        self.logger.info(f"gear_up for {monster}, got bank contents")
+        self.deposit_all_inventory_to_bank()
 
-        # Determine the best element for attack (choose the one with the highest attack value)
         defense_elements = {
             "air": monster.res_air,
             "earth": monster.res_earth,
             "fire": monster.res_fire,
             "water": monster.res_water
         }
-        lowest_defense_element = min(defense_elements, key=defense_elements.get)
 
-        # Determine the best element for defense (choose the one with the lowest resistance value)
         attack_elements = {
             "air": monster.attack_air,
             "earth": monster.attack_earth,
             "fire": monster.attack_fire,
             "water": monster.attack_water
         }
-        best_attack_element = max(attack_elements, key=attack_elements.get)
 
-        print(f"{monster.code} highest attack: {best_attack_element}")
-        print(f"{monster.code} lowest defense: {lowest_defense_element}")
+        print(f"{monster.code} attack elements: {attack_elements}")
+        print(f"{monster.code} resist elements: {defense_elements}")
+
+        contents = self.get_bank_contents()
+        self.logger.info(f"gear_up for {monster}, got bank contents")
+
+        slots = {
+            'weapon': ['weapon_slot'],
+            'rune': ['rune_slot'],
+            'shield': ['shield_slot'],
+            'helmet': ['helmet_slot'],
+            'body_armor': ['body_armor_slot'],
+            'leg_armor': ['leg_armor_slot'],
+            'boots': ['boots_slot'],
+            'ring': ['ring1_slot','ring2_slot'],
+            'amulet': ['amulet_slot'],
+            'bag': ['bag_slot'],
+            'artifact': ['artifact1_slot','artifact2_slot','artifact3_slot']
+        }
+
+        weapon_chosen = False
+        weapon_attack_elements = []
+        for slot in slots.keys():
+            self.gear_up_slot(slot, slots[slot], contents, attack_elements, defense_elements, [], weapon_attack_elements)
+            if not weapon_chosen:
+                # weapon first, choose the rest based on the attack
+                weapon_chosen = True
+                weapon_code = self.api.char.weapon_slot
+                weapon = self.get_item(weapon_code)
+                for effect in weapon.effects:
+                    if effect.code.startswith('attack_'):
+                        attack_element = effect.code.replace("attack_","")
+                        weapon_attack_elements.append(attack_element)
+
+        self.logger.info(f"gear_up with main weapon {weapon_code} attack elements {weapon_attack_elements}")
+        self.deposit_all_inventory_to_bank()
+        self.get_consumables(contents, attack_elements, defense_elements, weapon_attack_elements)
+
+    def get_consumables(self, contents, attack_elements, defense_elements, weapon_attack_elements: List):
+        self.logger.info("get_consumables")
+        character_data = self.get_character()
+        best_items = {}
+        slots = ['utility1_slot','utility2_slot']
+        for slot in slots:
+            try:
+                original_item = getattr(character_data, slot)
+                best_items[slot] = original_item
+                if original_item:
+                    self.logger.info(f"slot {slot} already has {original_item}")
+            except AttributeError:
+                print(f"get_consumables slot '{slot}' not found.")
+                best_items['slot'] = None
+                exit(1)
 
         for item_dict in contents:
-            self.equip_better_item(item_dict['code'], best_attack_element, lowest_defense_element)
+            item_code = item_dict['code']
+            item = self.get_item(item_code)
+            if item.type != 'utility':
+                continue
+
+            if item.level != None and item.level > character_data.level:
+                self.logger.info(f"get_consumables item {item.code} is too high level {item.level} for me at {self.api.char.level}")
+                continue
+            
+            for best_key in best_items.keys():
+                best_item_code = best_items[best_key]
+                best_item = None
+                if best_item_code:
+                    best_item = self.get_item(best_item_code)
+                if self.item_better(best_item, item, attack_elements, defense_elements, weapon_attack_elements):
+                    if best_key == 'utility1_slot':
+                        if best_items['utility2_slot'] != item.code:
+                            best_items[best_key] = item.code
+                    else:
+                        if best_items['utility1_slot'] != item.code:
+                            best_items[best_key] = item.code
+
+        for slot in best_items.keys():
+            best_item_code = best_items[slot]
+            current = self.get_slot(slot)
+            if current != best_item_code:
+                equipped = False
+                self.logger.info(f"get_consumables switch from {current} to {best_item_code} in slot {slot}")
+                if current:
+                    if slot == 'utility1_slot':
+                        self.api.actions.unequip_item('utility1', self.api.char.utility1_slot_quantity)
+                    else:
+                        self.api.actions.unequip_item('utility2', self.api.char.utility2_slot_quantity)
+                quantity = self.withdraw_all(best_item_code, contents)
+                if quantity > 0:
+                    slot_name = slot.replace('_slot','')
+                    if self.api.actions.equip_item(best_item_code, slot_name, quantity):
+                        equipped = True
+                if not equipped:
+                    self.logger.info(f"\n\nERROR\n\n\get_consumables could not equip {best_item_code}, probably not really in the bank")
+                    exit(1)
+            else:
+                self.logger.info(f"top up on {current} in {slot}")
+                if slot == 'utility1_slot':
+                    current_quantity = self.api.char.utility1_slot_quantity
+                else:
+                    current_quantity = self.api.char.utility2_slot_quantity
+                taken = self.withdraw_all(current, contents)
+                ideal_amount = 100 - current_quantity
+                quantity = min(ideal_amount, taken)
+                if quantity == 0:
+                    self.logger.info(f"no more {current} to add")
+                    continue
+                slot_name = slot.replace('_slot','')
+                self.api.actions.equip_item(current, slot_name, quantity)
+
+        self.deposit_all_inventory_to_bank()
+        for item_dict in contents:
             item = self.get_item(item_dict['code'])
-            if item.type == 'consumable' and item.subtype == 'food' and item.code != 'cooked_gudgeon':
-                item_level = 1
-                if item.level:
-                    item_level = item.level
-                    self.logger.info(f"level from item.level {item_level}")
-                if item.craft:
-                    item_level = item.craft.get('level',1)
-                    self.logger.info(f"level from item.craft.level {item_level}")
-                if item_level <= self.api.char.level:
-                    amount = self.withdraw_all(item.code)
-                    self.logger.info(f"loaded up on {amount} {item}s")
+            if item.type == 'consumable' and item.subtype == 'food':
+                self.logger.info(f"load up on {item.code}")
+                self.withdraw_all(item.code, contents)
 
-    def equip_better_item(self, item_code, best_attack_element: str, lowest_defense_element: str):
-        new_item = self.get_item(item_code)
-        item_type = new_item.type
-        item_level = new_item.level
-        if not item_level:
-            if new_item.craft:
-                item_level = new_item.craft['level']
+    def gear_up_slot(self, slot_type, slots, contents, attack_elements, defense_elements, banned_items: List, weapon_attack_elements: List):
+        best_items = self.find_best_item(slot_type, slots, contents, attack_elements, defense_elements, banned_items, weapon_attack_elements)
+        self.logger.info(f"gear_up_slot best_items {best_items}")
+        for slot in best_items.keys():
+            best_item_code = best_items[slot]
+            current = self.get_slot(slot)
+            if current != best_item_code:
+                equipped = False
+                if self.withdraw_from_bank(best_item_code, 1):
+                    slot_name = slot.replace('_slot','')
+                    self.unequip(slot_name)
+                    if self.equip(best_item_code, slot_name):
+                        equipped = True
+                if not equipped:
+                    self.logger.info(f"\n\nERROR\n\n\ngear_up_slot could not equip {best_item_code}, probably not really in the bank")
+                    banned_items.append(best_item_code)
+                    self.gear_up_slot(slot_type, slots, contents, attack_elements, defense_elements, banned_items)
 
+    def find_best_item(self, slot_name, slots, contents, attack_elements, defense_elements, banned_items: List, weapon_attack_elements: List):
+        self.logger.info(f"find_best_item {slot_name} {slots} banned items {banned_items}")
         character_data = self.get_character()
 
-        if item_level:
-            if item_level > character_data.level:
-                self.logger.info(f"equip_better_item {item_code} is too high level ({item_level})")
-                return False
+        # Keep a map of slots to the best item for the slot, start with the original ones
+        best_items = {}
+        for slot in slots:
+            try:
+                original_item = getattr(character_data, slot)
+                best_items[slot] = original_item
+                if original_item:
+                    self.logger.info(f"slot {slot} already has {original_item}")
+            except AttributeError:
+                print(f"find_best_item slot '{slot}' not found.")
+                best_items['slot'] = None
+                return
+
+        # Iterate everything looking for best items
+        for item_dict in contents:
+            item_code = item_dict['code']
+            if item_code in banned_items:
+                self.logger.info(f"find_best_item {item_code} banned")
+
+            item = self.get_item(item_code)
+
+            if item.type != slot_name:
+                continue
+
+            if item.level > character_data.level:
+                self.logger.info(f"item {item.code} is too high level {item.level} for me at {self.api.char.level}")
+                continue
+            
+            for best_key in best_items.keys():
+                best_item_code = best_items[best_key]
+                best_item = None
+                if best_item_code:
+                    best_item = self.get_item(best_item_code)
+                if self.item_better(best_item, item, attack_elements, defense_elements, weapon_attack_elements):
+                    self.logger.info(f"find_best_item {item} is better")
+                    best_items[best_key] = item.code
         
-        slots = ['weapon_slot','rune_slot','shield_slot','helmet_slot','body_armor_slot','leg_armor_slot','boots_slot','ring1_slot','ring2_slot','amulet_slot','bag_slot']
+        return best_items
 
-        if item_type:
-            if item_type == 'ring':
-                original_item = character_data.ring1_slot
-                if not self.equip_from_bank_if_better(new_item, original_item, 'ring1', best_attack_element, lowest_defense_element):
-                    original_item = character_data.ring2_slot
-                    return self.equip_from_bank_if_better(new_item, original_item, 'ring2', best_attack_element, lowest_defense_element)
-                else:
-                    return True
-            elif new_item.type == 'utility' and new_item.subtype == 'potion' and item_level <= self.api.char.level:
-                heal_value = 0
-                if new_item.effects:
-                    for effect in new_item.effects:
-                        if effect.code == 'restore':
-                            heal_value = effect.attributes['value']
-                if heal_value > 0:
-                    if self.withdraw_all(new_item.code):
-                        self.equip_utility(new_item.code)
-                        # put leftovers back in
-                        self.deposit_all_inventory_to_bank()
-            else:
-                slot = f'{item_type}_slot'
-                if not slot in slots:
-                    return False
-                try:
-                    original_item = getattr(character_data, slot)
-                except AttributeError:
-                    print(f"slot '{slot}' not found.")
-                    return
+    def item_better(self, best_item, item, attack_elements, defense_elements, weapon_attack_elements: List):
+        if item.level > self.api.char.level:
+            return False
+        
+        best_total = 0
+        best_item_code = "None"
+        if best_item:
+            best_total = self.calculate_item_value(best_item, attack_elements, defense_elements, weapon_attack_elements)
+            best_item_code = best_item.code
 
-                return self.equip_from_bank_if_better(new_item, original_item, item_type, best_attack_element, lowest_defense_element)
-        return False
+        new_total = self.calculate_item_value(item, attack_elements, defense_elements, weapon_attack_elements)
+        self.logger.info(f"item_better best {best_item_code} = {best_total}, new {item.code} = {new_total}")
+        return new_total > best_total and new_total > 0
 
-    def equip_from_bank_if_better(self, new_item: Item, original_item, slot, best_attack_element: str, lowest_defense_element: str):
-        if not original_item:
-            self.logger.info(f"equip_from_bank_if_better {new_item.code} is better than nothing, changing {slot}")
-            self.withdraw_from_bank(new_item.code,1)
-            self.unequip(slot)
-            self.equip(new_item.code,slot)
-            return True
-        else:
-            original: Item = self.get_item(original_item)
-            original_total = 0
-            for effect in original.effects:
-                if effect.code == f"attack_{lowest_defense_element}":
-                    original_total += effect.attributes['value']
-                if effect.code == f"dmg_{lowest_defense_element}":
-                    original_total += effect.attributes['value']
-                elif effect.code == f"res_{best_attack_element}":
-                    original_total += effect.attributes['value']
-                elif effect.code == "hp":
-                    original_total += effect.attributes['value']
-                elif effect.code == "dmg":
-                    original_total += effect.attributes['value']
-                elif effect.code == "wisdom": # very important
-                    original_total += effect.attributes['value'] * 3
-                elif effect.code.startswith('attack'):
-                    original_total += effect.attributes['value']/2
-                elif effect.code.startswith('dmg'):
-                    original_total += effect.attributes['value']/2
-                elif effect.code.startswith('res'):
-                    original_total += effect.attributes['value']/2
+    def calculate_item_value(self, item, attack_elements: Dict, defense_elements: Dict, weapon_attack_elements: List):
+        self.logger.info(f"calculate_item_value {item.code}, attack {attack_elements}, defense {defense_elements}")
+        # Samples
+        # ogre attack elements: {'air': 0, 'earth': 80, 'fire': 0, 'water': 0}
+        # ogre resist elements: {'air': 0, 'earth': 30, 'fire': -20, 'water': 0}
+        value = 0
+        estimated_rounds = 7
+        for effect in item.effects:
+            # Hp once per battle
+            if effect.code == "hp":
+                add = effect.attributes['value']
+                self.logger.info(f"calculate_item_value hp {add}")
+                value += add
 
-            # Calculate the total value for the new item
-            new_total = 0
-            for effect in new_item.effects:
-                if effect.code == f"dmg_{lowest_defense_element}":
-                    new_total += effect.attributes['value']
-                if effect.code == f"attack_{lowest_defense_element}":
-                    new_total += effect.attributes['value']
-                elif effect.code == f"res_{best_attack_element}":
-                    new_total += effect.attributes['value']
-                elif effect.code == "hp":
-                    new_total += effect.attributes['value']
-                elif effect.code == "dmg":
-                    new_total += effect.attributes['value']
-                elif effect.code == "wisdom": # very important
-                    new_total += effect.attributes['value'] * 3
-                elif effect.code.startswith('attack'): # other attack values at half, they all count
-                    new_total += effect.attributes['value']/2
-                elif effect.code.startswith('dmg'):
-                    new_total += effect.attributes['value']/2
-                elif effect.code.startswith('res'):
-                    new_total += effect.attributes['value']/2
+            # Damage per round per damage type
+            if effect.code == "dmg":
+                add = effect.attributes['value'] * estimated_rounds * len(weapon_attack_elements)
+                self.logger.info(f"calculate_item_value dmg {add}")
+                value += add
 
-            # Compare the totals and equip the new item if it's better
-            if new_total > original_total:
-                self.logger.info(f"equip_from_bank_if_better {new_item.code} has a higher total value ({new_total}) than {original.code} ({original_total}), equipping {slot}")
-                self.unequip(slot)
-                self.withdraw_from_bank(new_item.code, 1)
-                self.equip(new_item.code, slot)
-                self.deposit_to_bank(original.code,1)
-                return True
-            else:
-                self.logger.info(f"equip_from_bank_if_better \n\n{new_item}\n\n has a lower total value ({new_total}) than \n\n{original} \n\n({original_total}), not equipping {slot}")
-                return False
+            # Restore per round
+            if effect.code == "restore":
+                add = effect.attributes['value'] * estimated_rounds
+                self.logger.info(f"calculate_item_value restore {add}")
+                value += add
+
+            # Heal per round
+            if effect.code == "heal":
+                add = effect.attributes['value'] * estimated_rounds
+                self.logger.info(f"calculate_item_value heal {add}")
+                value += add
+
+            # Resistance per round
+            elif effect.code.startswith("res_"):
+                for element in attack_elements.keys():
+                    attack_element_value = attack_elements[element]
+                    if attack_element_value > 0:
+                        if effect.code == f"res_{element}":
+                            add = effect.attributes['value'] * estimated_rounds
+                            self.logger.info(f"calculate_item_value defense {effect.code} {add}")
+                            value += add
+
+            # Attack per round weighted to the resistances
+            elif effect.code.startswith("attack") or effect.code.startswith("dmg") or effect.code.startswith("boost_dmg_"):
+                for element in defense_elements.keys():
+                    if effect.code == f"attack_{element}" or effect.code == f"dmg_{element}" or effect.code == f"boost_dmg_{element}":
+                        if len(weapon_attack_elements) > 0 and not element in weapon_attack_elements:
+                            self.logger.info(f"not picking {item.code} for effect {effect}, not in weapon effects {weapon_attack_elements}")
+                            continue
+                        defense_element_value = defense_elements[element]
+                        add = max(effect.attributes['value'] - defense_element_value, 0) * estimated_rounds
+                        self.logger.info(f"calculate_item_value attack {effect.code} {add}")
+                        value += add
+
+        return value
 
     def fight_xp(self):
-        self.logger.info('Fight loop')
         level = self.api.char.level
         target_monster_level = level - 10
+        self.logger.info(f'Fight loop level {level}, target {target_monster_level}')
 
-        monsters = self.api.monsters.get(min_level=target_monster_level,max_level=level-8)
+        monsters = self.api.monsters.get(min_level=target_monster_level,max_level=level-7)
         if not monsters:
             self.logger.info('No monsters found within the level range')
             return None
@@ -309,15 +433,17 @@ class CharacterAPI:
             all_data.extend(response.get("data",[]))
         return all_data
     
-    def withdraw_all(self, code: str) -> int:
-        contents = self.get_bank_contents()
+    def withdraw_all(self, code: str, contents = None) -> int:
+        if not contents:
+            contents = self.get_bank_contents()
         space = self.api.char.get_inventory_space() - 25
         for item in contents:
             if item["code"] == code:
                 quantity = min(item['quantity'],100)
                 take = min(space,quantity)
-                self.withdraw_from_bank(code,take)
-                return take
+                if take > 0:
+                    if self.withdraw_from_bank(code,take):
+                        return take
         return 0
 
     def withdraw_from_bank(self, code: str, quantity: int) -> Optional[Dict]:
@@ -531,7 +657,6 @@ class CharacterAPI:
             return
 
         if slot_value:
-            self.logger.info("unequip")
             response = self.api.actions.unequip_item(slot)
             if response:
                 self.logger.info(f"{self.current_character}: Successfully unequipped item from slot: {slot}")
@@ -569,6 +694,7 @@ class CharacterAPI:
             self.logger.info(f'gearcraft level {character_json.get("gearcrafting_level", 0)} {character_json.get("gearcrafting_xp", 0)}/{character_json.get("gearcrafting_max_xp", 0)}')
             self.logger.info(f'jewelrycraft level {character_json.get("jewelrycrafting_level", 0)} {character_json.get("jewelrycrafting_xp", 0)}/{character_json.get("jewelrycrafting_max_xp", 0)}')
             self.logger.info(f'woodcutting level {character_json.get("woodcutting_level", 0)} {character_json.get("woodcutting_xp", 0)}/{character_json.get("woodcutting_max_xp", 0)}')
+            self.logger.info(f'fishing level {character_json.get("fishing_level", 0)} {character_json.get("fishing_xp", 0)}/{character_json.get("fishing_max_xp", 0)}')
             self.logger.info(f'mining level {character_json.get("mining_level", 0)} {character_json.get("mining_xp", 0)}/{character_json.get("mining_max_xp", 0)}')
             self.logger.info(f'alchemy level {character_json.get("alchemy_level", 0)} {character_json.get("alchemy_xp", 0)}/{character_json.get("alchemy_max_xp", 0)}')
             self.logger.info(f'cooking level {character_json.get("cooking_level", 0)} {character_json.get("cooking_xp", 0)}/{character_json.get("cooking_max_xp", 0)}')
@@ -706,7 +832,7 @@ class CharacterAPI:
             self.logger.info(f"{self.current_character}: Fight!!!")
             response = self.api.actions.fight()
             if not response:
-                self.logger.info(f"Can't beat monster to get {item_code}")
+                self.logger.info(f"fight_drop no response Can't beat monster to get {item_code}")
                 return False
 
             fight_data = response.get("data", {}).get("fight", {})
@@ -726,7 +852,7 @@ class CharacterAPI:
             self.logger.info(f"{self.current_character}: Level {level} progress {xp}/{max_hp}")
 
             if result == "loss":
-                self.logger.info(f"Can't beat monster to get {item_code}")
+                self.logger.info(f"Can't beat monster to get {item_code}, losses {losses + 1}")
                 self.move_character(start_x, start_y)
                 losses += 1
 
@@ -736,7 +862,7 @@ class CharacterAPI:
                     self.logger.info(f"{self.current_character}:   - {drop['code']}: {drop['quantity']}")
                     if drop['code'] == item_code:
                         total += drop.get('quantity',1)
-        return True
+        return losses < 3
     
     def get_skill_level(self, skill_name: str) -> int:
         # Construct the attribute name for the skill level
@@ -750,13 +876,15 @@ class CharacterAPI:
             print(f"Skill '{skill_name}' not found.")
             return -1
 
-    def get_slot(self, slot_name: str) -> int:
-        level_attribute = f"{slot_name.lower()}_slot"
+    def get_slot(self, slot_name: str) -> str:
+        level_attribute = f"{slot_name.lower()}"
+        if not slot_name.endswith("_slot"):
+            slot_name += "_slot"
         try:
             return getattr(self.api.char, level_attribute)
         except AttributeError:
             print(f"slot_name '{slot_name}' not found.")
-            return -1
+            return None
         
     def get_character(self):
         """

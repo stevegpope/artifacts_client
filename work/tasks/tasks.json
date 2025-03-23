@@ -1,1 +1,478 @@
-[]
+[
+    {
+        "role": "fighter",
+        "code": "vampire_tooth"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_tooth"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_tooth"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_tooth"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_blood"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_blood"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_blood"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_blood"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_blood"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_tooth"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_tooth"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_tooth"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_tooth"
+    },
+    {
+        "role": "fighter",
+        "code": "vampire_tooth"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    }
+]

@@ -67,10 +67,10 @@ def fill_orders(character: CharacterAPI, role: str):
         # Fallback behavior if no tasks found
         if role == 'fighter':
             character.fight_xp()
-            return True
         elif role == 'crafter':
             craft_orders(character)
-            return True
+        elif role == 'top_crafter':
+            craft_orders(character, top=True)
         elif role == 'tasker':
             do_tasks(character, fight_tasker=False)
         elif role == 'fight_tasker':
@@ -82,13 +82,14 @@ def fill_orders(character: CharacterAPI, role: str):
         elif role == 'recycler':
             recycle(character)
         elif role == 'potion_maker':
-            item = character.get_item('small_health_potion')
+            item = character.get_item('fire_boost_potion')
             craft_item(character, item, 10)
         elif role == 'lumberjack':
             gather_highest(character, 'woodcutting')
+        elif role == 'scavenger':
+            gather_highest(character,'alchemy')
         elif role == 'alchemist':
             craft_gear(character, 'alchemy')
-            fill_orders(character, 'forager')
         elif role == 'gudgeon':
             gather(character, 'gudgeon', 100)
     else:
@@ -187,37 +188,46 @@ def gather_highest(character: CharacterAPI, skill: str = None):
     character.unequip('weapon')
     character.deposit_all_inventory_to_bank()
 
-def craft_gear(character: CharacterAPI, skill: str = None):
+def craft_gear(character: CharacterAPI, skill: str = None, top: bool = False):
     skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting', 'cooking','alchemy']
-    if not skill:
+    if top or not skill:
         # - pick a skill if not given
         # - choose an item at the lowest level we can craft that is over level - 10
         skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting', 'cooking','alchemy']
         lowest_skill: str
         lowest_level = 100
         quantity = 1
-        for skill in skills:
-            skill_level = character.get_skill_level(skill)
-            logger.info(f"craft_gear skill {skill} level {skill_level}")
-            if skill_level < lowest_level:
-                lowest_level = skill_level
-                lowest_skill = skill
-                lowest_choice_level = skill_level - 10
-                logger.info(f"craft_gear skill {skill} level {skill_level}, lowest allowed {lowest_choice_level}")
+        if top:
+            skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting']
+            lowest_skill = random.choice(skills)
+            skill_level = character.get_skill_level(lowest_skill)
+            lowest_choice_level = (skill_level // 5) * 5
+            logger.info(f"craft_gear skill {lowest_skill} level {skill_level}, top craft level {lowest_choice_level}")
+        else:
+            for skill in skills:
+                skill_level = character.get_skill_level(skill)
+                logger.info(f"craft_gear skill {skill} level {skill_level}")
+                if skill_level < lowest_level:
+                    lowest_level = skill_level
+                    lowest_skill = skill
+                    lowest_choice_level = skill_level - 10
+                    logger.info(f"craft_gear skill {skill} level {skill_level}, lowest allowed {lowest_choice_level}")
+        ordered = False
     else:
-        quantity = 5
+        quantity = 25
         lowest_skill = skill
         skill_level = character.get_skill_level(skill)
-        lowest_choice_level = skill_level - 10
+        lowest_choice_level = 10
+        ordered = False # no ordering items for you
 
     item = choose_lowest_item(character, lowest_skill, lowest_choice_level)
     if not item:
         logger.info(f"craft_gear cannot craft anything for {skill}, try another skill while we wait")
-        return craft_gear(character, random.choice(skills))
+        return craft_gear(character, random.choice(skills), top=True)
 
     logger.info(f"craft_gear craft {item.code}")
     
-    if not craft_item(character, item, quantity):
+    if not craft_item(character, item, quantity, ordered):
         logger.info(f"craft_gear can't craft {item.code} now, leaving in place")
     else:
         logger.info(f"craft_gear finished making {item.code}, removing from current orders")
@@ -226,7 +236,7 @@ def craft_gear(character: CharacterAPI, skill: str = None):
     logger.info(f"craft_gear banned orders {banned_orders.read_tasks()}")
     return True
 
-def craft_orders(character: CharacterAPI):
+def craft_orders(character: CharacterAPI, top: bool = False):
     orders = current_orders.read_tasks()
     for code in orders:
         item = character.get_item(code)
@@ -245,13 +255,12 @@ def craft_orders(character: CharacterAPI):
             character.deposit_all_inventory_to_bank()
             current_orders.delete_entry(code)
     
-    logger.info(f"craft_orders done checking current orders, go recycle something")
-    craft_gear(character)
+    craft_gear(character, top = top)
     recycle(character)
 
 
-def craft_item(character: CharacterAPI, item: Item, quantity: int = 1):
-    logger.info(f"craft_item craft {item}")
+def craft_item(character: CharacterAPI, item: Item, quantity: int = 1, ordered: bool = False):
+    logger.info(f"craft_item craft {quantity} {item}")
     code = item.code
     craft = item.craft
     if not craft:
@@ -269,12 +278,7 @@ def craft_item(character: CharacterAPI, item: Item, quantity: int = 1):
     character.move_character(bank_x,bank_y)
     character.deposit_all_inventory_to_bank()
 
-    for requirement in requirements:
-        if requirement['code'] == 'jasper_crystal':
-            logger.info("craft_item This requires jasper_crytal, not doing that")
-            return False
-
-    need_something = has_requirements(character,item.code, requirements, False, quantity)
+    need_something = has_requirements(character,item.code, requirements, ordered, quantity)
     if need_something == 2:
         logger.info(f"craft_item Cannot craft {code}, bailing")
         return False
@@ -379,6 +383,7 @@ def choose_lowest_item(character: CharacterAPI, skill: str, lowest_skill: int = 
     items = api.all_items()
     banned_tasks = banned_orders.read_tasks()
 
+    logger.info(f"there are {len(items)} items in total")
     for item in items:
         item: Item
         craft = item.craft
@@ -386,7 +391,7 @@ def choose_lowest_item(character: CharacterAPI, skill: str, lowest_skill: int = 
         if craft:
             if craft.get("skill") == skill:
                 item_level = craft.get("level")
-                if item_level >= skill_level:
+                if item_level > skill_level:
                     continue
 
                 if item_level < lowest_skill:
@@ -409,7 +414,7 @@ def choose_lowest_item(character: CharacterAPI, skill: str, lowest_skill: int = 
         item for item in craftable_items
         if item.code not in current_orders.read_tasks()
         and item.code not in banned_orders.read_tasks()
-        and item.code not in ['wooden_stick', 'jasper_crystal']
+        and item.code not in ['wooden_stick']
     ]
 
     if not valid_items:
@@ -532,12 +537,16 @@ def hunt_for_items(character, item_code, quantity):
                 if drop.code == item_code:
                     character.gear_up(monster)
                     x,y = character.find_closest_content('monster',monster.code)
-                    character.move_character(x,y)
-                    character.rest()
-                    if not character.fight_drop(quantity, item_code):
-                        logger.info(f"cannot fight to get {item_code}")
+                    if x and y:
+                        character.move_character(x,y)
+                        character.rest()
+                        if not character.fight_drop(quantity, item_code):
+                            logger.info(f"cannot fight to get {item_code}")
+                            return False
+                        return True
+                    else:
+                        logger.info(f"cannot find monster on map")
                         return False
-                    return True
 
 def do_tasks(character: CharacterAPI, fight_tasker: bool = False):
     task = character.choose_task(fight_tasker)
@@ -583,7 +592,7 @@ def handle_items_task(character: CharacterAPI, task_data: Dict):
     
     total = task_data['total']
     quantity = total - progress 
-    batch_size = 10
+    batch_size = 25
 
     while quantity > 0:
         current_batch = min(batch_size, quantity)
@@ -605,7 +614,23 @@ def handle_items_task(character: CharacterAPI, task_data: Dict):
     x, y = character.find_closest_content('tasks_master','items')
     character.move_character(x, y)
     character.complete_task()
+    trade_coins(character)
 
+def trade_coins(character: CharacterAPI):
+    x,y = character.find_closest_content('bank','bank')
+    character.move_character(x,y)
+    character.deposit_all_inventory_to_bank()
+    quantity = character.withdraw_all('tasks_coin')
+    if quantity > 6:
+        x, y = character.find_closest_content('tasks_master','items')
+        character.move_character(x, y)
+        while quantity >= 6:
+            character.exchange_task_coins()
+            quantity -= 6
+    x,y = character.find_closest_content('bank','bank')
+    character.move_character(x,y)
+    character.deposit_all_inventory_to_bank()
+    
 
 def handle_unknown_task(task_data: Dict):
     """
