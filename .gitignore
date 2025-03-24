@@ -12,3 +12,13 @@ __pycache__/
 work/tasks/tasks.txt
 work/tasks/tasks.txt
 work/tasks/tasks.json
+*.txt
+work/tasks/banned_orders_baz.json
+work/tasks/banned_orders_baz1.json
+work/tasks/banned_orders_baz2.json
+work/tasks/banned_orders_baz3.json
+work/tasks/banned_orders_baz4.json
+work/tasks/current_orders_baz1.json
+work/tasks/current_orders_baz2.json
+work/tasks/current_orders_baz3.json
+work/tasks/tasks.json

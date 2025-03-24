@@ -24,6 +24,8 @@ def setup_tasks(m_logger, m_character, role, m_api):
     task_queue = TaskQueue()
     current_orders = TaskQueue(f"C:\\Users\\sarah\\Desktop\\code\\artifacts\\work\\tasks\\current_orders_{m_character}.json")
     banned_orders = TaskQueue(f"C:\\Users\\sarah\\Desktop\\code\\artifacts\\work\\tasks\\banned_orders_{m_character}.json")
+    #current_orders.clear_tasks()
+    banned_orders.clear_tasks()
 
 def fill_orders(character: CharacterAPI, role: str):
     character.unequip('weapon')
@@ -238,10 +240,11 @@ def craft_gear(character: CharacterAPI, skill: str = None, top: bool = False):
 
 def craft_orders(character: CharacterAPI, top: bool = False):
     orders = current_orders.read_tasks()
+    contents = character.get_bank_contents()
     for code in orders:
         item = character.get_item(code)
         logger.info(f"craft_orders craft order {item}")
-        if item and item.craft and has_requirements(character, item.code, item.craft['items'], ordered=True) == 0:
+        if item and item.craft and has_requirements(character, item.code, item.craft['items'], ordered=True, contents=contents) == 0:
             logger.info(f"craft_orders enough to go craft order {code}")
             logger.info(f"craft_orders requirements met, go craft {code}")
             skill = item.craft['skill']
@@ -301,9 +304,12 @@ def craft_item(character: CharacterAPI, item: Item, quantity: int = 1, ordered: 
     character.deposit_to_bank(item.code, quantity)
     return xp != -1
 
-def has_requirements(character: CharacterAPI, item_code: str, requirements, ordered: bool, quantity: int = 1):
+def has_requirements(character: CharacterAPI, item_code: str, requirements, ordered: bool, quantity: int = 1, contents: List[Dict] = None):
     need_something = 0
-    bank_contents = api.get_bank_contents()
+    if contents is not None:
+        bank_contents = contents
+    else:
+        bank_contents = api.get_bank_contents()
     for requirement in requirements:
         required_quantity = requirement['quantity'] * quantity
         logger.info(f"has_requirements check for {required_quantity} {requirement['code']}")
@@ -339,7 +345,7 @@ def has_requirements(character: CharacterAPI, item_code: str, requirements, orde
 
 def order_items(character: CharacterAPI, item_code: str, quantity: int):
     logger.info(f'Ordering {quantity} {item_code}')
-    item = api.get_item(item_code)
+    item: Item = api.get_item(item_code)
     if item.type != 'resource':
         logger.info(f'item is not resource to gather: {item}')
         return False
@@ -355,17 +361,29 @@ def order_items(character: CharacterAPI, item_code: str, quantity: int):
             task_queue.create_task({"role":"fighter","code": item_code})
         return True
     
-    if item.craft != None:
-        logger.info(f'to gather {item_code} we need to craft it')
-        batch_size = 5
+    if item.craft is not None:
+        logger.info(f'order_items To gather {item_code}, we need to craft it')
+        space = character.api.char.get_inventory_space()
+        space_per_item = 0
+        for craftitem in item.craft.get('items',[]):
+            space_per_item += craftitem.get('quantity',1)
+
+        batch_size = min(int(space / space_per_item), quantity)
+        logger.info(f"{item.code} requires {space_per_item} space per item, batch size {batch_size}")
+        
         while quantity > 0:
             current_batch = min(batch_size, quantity)
+            logger.info(f"Crafting batch of {current_batch}")
+            
             if not craft_item(character, item, current_batch):
                 logger.info(f"order_items cannot craft {item_code}")
-                for index in range(quantity):
-                    task_queue.create_task({"role":"forager","code": item_code})
+                for _ in range(quantity):  
+                    task_queue.create_task({"role": "forager", "code": item_code})
                 return False
+            
             quantity -= current_batch
+        
+        logger.info(f"Successfully crafted the full requested amount of {item_code}")
         return True
 
     for index in range(quantity):
@@ -435,7 +453,7 @@ def choose_lowest_item(character: CharacterAPI, skill: str, lowest_skill: int = 
 def gather(character: CharacterAPI, item_code: str, quantity: int):
     logger.info(f'Gather {quantity} {item_code}')
 
-    item = api.get_item(item_code)
+    item: Item = api.get_item(item_code)
 
     subtype = item.subtype
     if subtype == 'task':
@@ -446,8 +464,14 @@ def gather(character: CharacterAPI, item_code: str, quantity: int):
         return hunt_for_items(character, item_code, quantity)
 
     if item.craft != None:
-        logger.info(f'to gather {item_code} need to craft it')
-        batch_size = 10
+        logger.info(f'gather to gather {item_code} need to craft it {item.craft}')
+        space = character.api.char.get_inventory_space()
+        space_per_item = 0
+        for craftitem in item.craft.get('items',[]):
+            space_per_item += craftitem.get('quantity',1)
+
+        batch_size = min(int(space / space_per_item), quantity)
+        logger.info(f"{item.code} requires {space_per_item} space per item, batch size {batch_size}")
         while quantity > 0:
             current_batch = min(batch_size, quantity)
             if not craft_item(character, item, current_batch):

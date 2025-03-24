@@ -254,7 +254,7 @@ class CharacterAPI:
                 if not equipped:
                     self.logger.info(f"\n\nERROR\n\n\ngear_up_slot could not equip {best_item_code}, probably not really in the bank")
                     banned_items.append(best_item_code)
-                    self.gear_up_slot(slot_type, slots, contents, attack_elements, defense_elements, banned_items)
+                    self.gear_up_slot(slot_type, slots, contents, attack_elements, defense_elements, banned_items, weapon_attack_elements)
 
     def find_best_item(self, slot_name, slots, contents, attack_elements, defense_elements, banned_items: List, weapon_attack_elements: List):
         self.logger.info(f"find_best_item {slot_name} {slots} banned items {banned_items}")
