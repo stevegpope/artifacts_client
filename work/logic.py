@@ -33,6 +33,7 @@ def process():
             smarty.do_something_smart()
         else:
             fill_orders(api, role)
+            bank_x,bank_y = api.find_closest_content('bank','bank')
             api.move_character(bank_x,bank_y)
             api.deposit_all_inventory_to_bank()
 

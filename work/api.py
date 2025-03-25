@@ -214,7 +214,7 @@ class CharacterAPI:
                     if self.api.actions.equip_item(best_item_code, slot_name, quantity):
                         equipped = True
                 if not equipped:
-                    self.logger.info(f"\n\nERROR\n\n\get_consumables could not equip {best_item_code}, probably not really in the bank")
+                    self.logger.info(f"\n\nERROR\n\nget_consumables could not equip {best_item_code}, probably not really in the bank")
                     exit(1)
             else:
                 self.logger.info(f"top up on {current} in {slot}")
@@ -278,6 +278,7 @@ class CharacterAPI:
             item_code = item_dict['code']
             if item_code in banned_items:
                 self.logger.info(f"find_best_item {item_code} banned")
+                continue
 
             item = self.get_item(item_code)
 
@@ -339,6 +340,17 @@ class CharacterAPI:
                 self.logger.info(f"calculate_item_value restore {add}")
                 value += add
 
+            # Prospecting for drops, but not high value. This will choose it over nothing
+            if effect.code == "prospecting":
+                add = effect.attributes['value'] / 10
+                self.logger.info(f"calculate_item_value prospecting {add}")
+                value += add
+            # Wisdom for xp, also not high value
+            if effect.code == "wisdom":
+                add = effect.attributes['value'] / 10
+                self.logger.info(f"calculate_item_value wisdom {add}")
+                value += add
+
             # Heal per round
             if effect.code == "heal":
                 add = effect.attributes['value'] * estimated_rounds
@@ -398,7 +410,6 @@ class CharacterAPI:
         char_x = self.api.char.pos.x
         char_y = self.api.char.pos.y
         
-        # Initialize variables to store the closest tile's coordinates and distance
         closest_distance = float('inf')
         x = None
         y = None
@@ -408,8 +419,8 @@ class CharacterAPI:
             if tile.content_code != content_code:
                 continue
 
-            # Calculate the Euclidean distance between the character and the tile
-            distance = math.sqrt((tile.x - char_x)**2 + (tile.y - char_y)**2)
+            # Calculate the Manhattan distance between the character and the tile
+            distance = abs(tile.x - char_x) + abs(tile.y - char_y)
             
             # Update the closest tile if this tile is closer
             if distance < closest_distance:

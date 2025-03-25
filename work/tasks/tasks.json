@@ -20,6 +20,186 @@
         "code": "dead_wood_plank"
     },
     {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "dead_wood_plank"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "forager",
+        "code": "iron_ore"
+    },
+    {
+        "role": "fighter",
+        "code": "lizard_skin"
+    },
+    {
+        "role": "fighter",
+        "code": "lizard_skin"
+    },
+    {
+        "role": "fighter",
+        "code": "lizard_skin"
+    },
+    {
+        "role": "fighter",
+        "code": "lizard_skin"
+    },
+    {
+        "role": "fighter",
+        "code": "lizard_skin"
+    },
+    {
         "role": "fighter",
         "code": "lizard_skin"
     },
@@ -60,68 +240,24 @@
         "code": "dead_wood_plank"
     },
     {
-        "role": "fighter",
-        "code": "cyclops_eye"
+        "role": "forager",
+        "code": "dead_wood_plank"
     },
     {
-        "role": "fighter",
-        "code": "cyclops_eye"
+        "role": "forager",
+        "code": "dead_wood_plank"
     },
     {
-        "role": "fighter",
-        "code": "cyclops_eye"
+        "role": "forager",
+        "code": "dead_wood_plank"
     },
     {
-        "role": "fighter",
-        "code": "cyclops_eye"
+        "role": "forager",
+        "code": "dead_wood_plank"
     },
     {
-        "role": "fighter",
-        "code": "cyclops_eye"
-    },
-    {
-        "role": "fighter",
-        "code": "cyclops_eye"
-    },
-    {
-        "role": "fighter",
-        "code": "lizard_skin"
-    },
-    {
-        "role": "fighter",
-        "code": "lizard_skin"
-    },
-    {
-        "role": "fighter",
-        "code": "lizard_skin"
-    },
-    {
-        "role": "fighter",
-        "code": "lizard_skin"
-    },
-    {
-        "role": "fighter",
-        "code": "lizard_skin"
-    },
-    {
-        "role": "fighter",
-        "code": "lizard_skin"
-    },
-    {
-        "role": "fighter",
-        "code": "lizard_skin"
-    },
-    {
-        "role": "fighter",
-        "code": "lizard_skin"
-    },
-    {
-        "role": "fighter",
-        "code": "lizard_skin"
-    },
-    {
-        "role": "fighter",
-        "code": "lizard_skin"
+        "role": "forager",
+        "code": "dead_wood_plank"
     },
     {
         "role": "fighter",
@@ -133,18 +269,42 @@
     },
     {
         "role": "fighter",
-        "code": "lizard_eye"
+        "code": "lizard_skin"
     },
     {
         "role": "fighter",
-        "code": "lizard_eye"
+        "code": "lizard_skin"
     },
     {
         "role": "fighter",
-        "code": "lizard_eye"
+        "code": "lizard_skin"
     },
     {
         "role": "fighter",
-        "code": "lizard_eye"
+        "code": "lizard_skin"
+    },
+    {
+        "role": "fighter",
+        "code": "lizard_skin"
+    },
+    {
+        "role": "fighter",
+        "code": "lizard_skin"
+    },
+    {
+        "role": "fighter",
+        "code": "lizard_skin"
+    },
+    {
+        "role": "fighter",
+        "code": "lizard_skin"
+    },
+    {
+        "role": "fighter",
+        "code": "lizard_skin"
+    },
+    {
+        "role": "fighter",
+        "code": "lizard_skin"
     }
 ]

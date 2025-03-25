@@ -94,6 +94,14 @@ def fill_orders(character: CharacterAPI, role: str):
             craft_gear(character, 'alchemy')
         elif role == 'gudgeon':
             gather(character, 'gudgeon', 100)
+        elif role == 'pig_hunter':
+            x,y = character.find_closest_content('monster','pig')
+            monster = character.api.monsters.get('pig')
+            character.gear_up(monster)
+            character.move_character(x,y)
+            character.fight(25)
+            x,y = character.find_closest_content('bank','bank')
+            character.move_character(x,y)
     else:
         # Perform the gathered tasks
         task_count = len(chosen_tasks)
@@ -369,7 +377,7 @@ def order_items(character: CharacterAPI, item_code: str, quantity: int):
             space_per_item += craftitem.get('quantity',1)
 
         batch_size = min(int(space / space_per_item), quantity)
-        logger.info(f"{item.code} requires {space_per_item} space per item, batch size {batch_size}")
+        logger.info(f"{item.code} requires {space_per_item} space per item, full space {space}, batch size {batch_size}")
         
         while quantity > 0:
             current_batch = min(batch_size, quantity)
@@ -461,7 +469,11 @@ def gather(character: CharacterAPI, item_code: str, quantity: int):
         return False
     
     if subtype == 'mob' or item_code == 'milk_bucket' or item_code == 'raw_wolf_meat':
-        return hunt_for_items(character, item_code, quantity)
+        if hunt_for_items(character, item_code, quantity):
+            x,y = character.find_closest_content('bank','bank')
+            character.move_character(x,y)
+            character.deposit_all_inventory_to_bank()
+            return True
 
     if item.craft != None:
         logger.info(f'gather to gather {item_code} need to craft it {item.craft}')
