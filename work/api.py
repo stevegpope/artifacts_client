@@ -167,8 +167,6 @@ class CharacterAPI:
             try:
                 original_item = getattr(character_data, slot)
                 best_items[slot] = original_item
-                if original_item:
-                    self.logger.info(f"slot {slot} already has {original_item}")
             except AttributeError:
                 print(f"get_consumables slot '{slot}' not found.")
                 best_items['slot'] = None
@@ -240,7 +238,6 @@ class CharacterAPI:
 
     def gear_up_slot(self, slot_type, slots, contents, attack_elements, defense_elements, banned_items: List, weapon_attack_elements: List):
         best_items = self.find_best_item(slot_type, slots, contents, attack_elements, defense_elements, banned_items, weapon_attack_elements)
-        self.logger.info(f"gear_up_slot best_items {best_items}")
         for slot in best_items.keys():
             best_item_code = best_items[slot]
             current = self.get_slot(slot)
@@ -257,7 +254,6 @@ class CharacterAPI:
                     self.gear_up_slot(slot_type, slots, contents, attack_elements, defense_elements, banned_items, weapon_attack_elements)
 
     def find_best_item(self, slot_name, slots, contents, attack_elements, defense_elements, banned_items: List, weapon_attack_elements: List):
-        self.logger.info(f"find_best_item {slot_name} {slots} banned items {banned_items}")
         character_data = self.get_character()
 
         # Keep a map of slots to the best item for the slot, start with the original ones
@@ -266,8 +262,6 @@ class CharacterAPI:
             try:
                 original_item = getattr(character_data, slot)
                 best_items[slot] = original_item
-                if original_item:
-                    self.logger.info(f"slot {slot} already has {original_item}")
             except AttributeError:
                 print(f"find_best_item slot '{slot}' not found.")
                 best_items['slot'] = None
@@ -295,7 +289,6 @@ class CharacterAPI:
                 if best_item_code:
                     best_item = self.get_item(best_item_code)
                 if self.item_better(best_item, item, attack_elements, defense_elements, weapon_attack_elements):
-                    self.logger.info(f"find_best_item {item} is better")
                     best_items[best_key] = item.code
         
         return best_items
@@ -311,11 +304,11 @@ class CharacterAPI:
             best_item_code = best_item.code
 
         new_total = self.calculate_item_value(item, attack_elements, defense_elements, weapon_attack_elements)
-        self.logger.info(f"item_better best {best_item_code} = {best_total}, new {item.code} = {new_total}")
-        return new_total > best_total and new_total > 0
-
+        better = new_total > best_total and new_total > 0
+        if better:
+            self.logger.info(f"item_better best {best_item_code} = {best_total}, new best {item.code} = {new_total}")
+        return better
     def calculate_item_value(self, item, attack_elements: Dict, defense_elements: Dict, weapon_attack_elements: List):
-        self.logger.info(f"calculate_item_value {item.code}, attack {attack_elements}, defense {defense_elements}")
         # Samples
         # ogre attack elements: {'air': 0, 'earth': 80, 'fire': 0, 'water': 0}
         # ogre resist elements: {'air': 0, 'earth': 30, 'fire': -20, 'water': 0}
@@ -325,36 +318,30 @@ class CharacterAPI:
             # Hp once per battle
             if effect.code == "hp":
                 add = effect.attributes['value']
-                self.logger.info(f"calculate_item_value hp {add}")
                 value += add
 
             # Damage per round per damage type
             if effect.code == "dmg":
                 add = effect.attributes['value'] * estimated_rounds * len(weapon_attack_elements)
-                self.logger.info(f"calculate_item_value dmg {add}")
                 value += add
 
             # Restore per round
             if effect.code == "restore":
                 add = effect.attributes['value'] * estimated_rounds
-                self.logger.info(f"calculate_item_value restore {add}")
                 value += add
 
             # Prospecting for drops, but not high value. This will choose it over nothing
             if effect.code == "prospecting":
                 add = effect.attributes['value'] / 10
-                self.logger.info(f"calculate_item_value prospecting {add}")
                 value += add
             # Wisdom for xp, also not high value
             if effect.code == "wisdom":
                 add = effect.attributes['value'] / 10
-                self.logger.info(f"calculate_item_value wisdom {add}")
                 value += add
 
             # Heal per round
             if effect.code == "heal":
                 add = effect.attributes['value'] * estimated_rounds
-                self.logger.info(f"calculate_item_value heal {add}")
                 value += add
 
             # Resistance per round
@@ -364,7 +351,6 @@ class CharacterAPI:
                     if attack_element_value > 0:
                         if effect.code == f"res_{element}":
                             add = effect.attributes['value'] * estimated_rounds
-                            self.logger.info(f"calculate_item_value defense {effect.code} {add}")
                             value += add
 
             # Attack per round weighted to the resistances
@@ -372,13 +358,10 @@ class CharacterAPI:
                 for element in defense_elements.keys():
                     if effect.code == f"attack_{element}" or effect.code == f"dmg_{element}" or effect.code == f"boost_dmg_{element}":
                         if len(weapon_attack_elements) > 0 and not element in weapon_attack_elements:
-                            self.logger.info(f"not picking {item.code} for effect {effect}, not in weapon effects {weapon_attack_elements}")
                             continue
                         defense_element_value = defense_elements[element]
                         add = max(effect.attributes['value'] - defense_element_value, 0) * estimated_rounds
-                        self.logger.info(f"calculate_item_value attack {effect.code} {add}")
                         value += add
-
         return value
 
     def fight_xp(self):
@@ -459,13 +442,8 @@ class CharacterAPI:
 
     def withdraw_from_bank(self, code: str, quantity: int) -> Optional[Dict]:
         try:
-            if quantity > 100:
-                self.logger.info(f"withdraw_from_bank too much {code} ordered {quantity}")
-                exit(1)
-                
             response = self.api.actions.bank_withdraw_item(code, quantity)
             if response:
-                self.logger.info(f"{self.current_character}: Successfully withdrew {quantity} of {code} from the bank")
                 return response
             else:
                 self.logger.error(f"{self.current_character}: Failed to withdraw items from the bank.")
@@ -489,7 +467,6 @@ class CharacterAPI:
         if response:
             details = response.get("data", {}).get("details", {})
             xp_gained = details.get("xp", 0)
-            self.logger.info(f"{self.current_character}: Successfully recycled {quantity} of {code}, got {xp_gained} xp.")
             return response
         else:
             self.logger.error(f"{self.current_character}: Failed to recycle")
@@ -552,15 +529,11 @@ class CharacterAPI:
 
     def complete_task(self):
         self.logger.info(f"{self.current_character}: Complete task")
-        response = self.api.actions.taskmaster_complete_task()
-        if response:
-            self.logger.info(f"{self.current_character}: Successfully completed task: {response}")
+        self.api.actions.taskmaster_complete_task()
 
     def trade_task_items(self, code: str, quantity: int):
         self.logger.info(f"{self.current_character}: Trade in {quantity} {code}")
         response = self.api.actions.taskmaster_trade_task(code, quantity)
-        if response:
-            self.logger.info(f"{self.current_character}: Successfully traded items")
 
     def equip_utility(self, code: str):
         existing_quantity = 0
@@ -588,9 +561,7 @@ class CharacterAPI:
 
                 self.logger.info(f"{self.current_character}: Equip {equip_quantity} {code} into {slot}")
                 try:
-                    response = self.api.actions.equip_item(code, slot, equip_quantity)
-                    if response:
-                        self.logger.info(f"{self.current_character}: Successfully equipped {code} into {slot}.")
+                    self.api.actions.equip_item(code, slot, equip_quantity)
                 except:
                     pass
 
@@ -602,15 +573,12 @@ class CharacterAPI:
             code (str): The code of the item to equip (e.g., "wooden_staff").
             slot (str): The slot to equip the item into (e.g., "weapon").
         """
-        self.logger.info(f"{self.current_character}: Equip {code} into {slot}")
         try:
             response = self.api.actions.equip_item(code, slot)
+            if response is not None:
+                return True
         except:
             return False
-
-        if response:
-            self.logger.info(f"{self.current_character}: Successfully equipped {code} into {slot}.")
-            return True
         return False
 
     def craft(self, item_code: str, amount: int = 1):
@@ -657,20 +625,16 @@ class CharacterAPI:
         Args:
             slot (str): The slot to unequip (e.g., "weapon", "helmet", "ring1").
         """
-        self.logger.info(f"{self.current_character}: Unequip {slot}")
         slot_attribute = f"{slot.lower()}_slot"
         # Use getattr to dynamically access the attribute
         try:
             slot_value = getattr(self.api.char, slot_attribute)
-            self.logger.info(f"{slot_attribute}:{slot_value}")
         except AttributeError:
             print(f"slot '{slot}' not found.")
             return
 
         if slot_value:
-            response = self.api.actions.unequip_item(slot)
-            if response:
-                self.logger.info(f"{self.current_character}: Successfully unequipped item from slot: {slot}")
+            self.api.actions.unequip_item(slot)
         else:
             self.logger.info(f"Nothing equipped in {slot_attribute}")
 
@@ -912,7 +876,6 @@ class CharacterAPI:
             x (int): The target x-coordinate.
             y (int): The target y-coordinate.
         """
-        self.logger.info(f"{self.current_character}: Move to {x},{y}")
         if self.api.char.pos.x == x and self.api.char.pos.y == y:
             return
         self.api.actions.move(x,y)

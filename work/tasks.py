@@ -88,6 +88,8 @@ def fill_orders(character: CharacterAPI, role: str):
             craft_item(character, item, 10)
         elif role == 'lumberjack':
             gather_highest(character, 'woodcutting')
+        elif role == 'fisherman':
+            gather_highest(character, 'fishing')
         elif role == 'scavenger':
             gather_highest(character,'alchemy')
         elif role == 'alchemist':
@@ -95,13 +97,9 @@ def fill_orders(character: CharacterAPI, role: str):
         elif role == 'gudgeon':
             gather(character, 'gudgeon', 100)
         elif role == 'pig_hunter':
-            x,y = character.find_closest_content('monster','pig')
-            monster = character.api.monsters.get('pig')
-            character.gear_up(monster)
-            character.move_character(x,y)
-            character.fight(25)
-            x,y = character.find_closest_content('bank','bank')
-            character.move_character(x,y)
+            hunt(character, 'pig')
+        elif role == 'ogre_hunter':
+            hunt(character, 'ogre')
     else:
         # Perform the gathered tasks
         task_count = len(chosen_tasks)
@@ -113,6 +111,15 @@ def fill_orders(character: CharacterAPI, role: str):
             for task in chosen_tasks:
                 task_queue.create_task(task)
     return True
+
+def hunt(character: CharacterAPI, monster_code: str):
+    x,y = character.find_closest_content('monster',monster_code)
+    monster = character.api.monsters.get(monster_code)
+    character.gear_up(monster)
+    character.move_character(x,y)
+    character.fight(25)
+    x,y = character.find_closest_content('bank','bank')
+    character.move_character(x,y)
 
 def recycle(character: CharacterAPI):
     logger.info("Go recycling")
@@ -133,14 +140,10 @@ def recycle(character: CharacterAPI):
                 needs_crystal = True
                 break
 
-        if needs_crystal:
-            logger.info(f"{item.code} requires crystal, do not recycle")
-            continue
-
         skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting']
         if skill not in skills:
             continue
-        if craft['level'] > 10:
+        if craft['level'] >= 10:
             quantity = max(bankitem['quantity'] - 5,0)
             if quantity > 0:
                 character.withdraw_from_bank(item.code, quantity)
@@ -270,7 +273,7 @@ def craft_orders(character: CharacterAPI, top: bool = False):
     recycle(character)
 
 
-def craft_item(character: CharacterAPI, item: Item, quantity: int = 1, ordered: bool = False):
+def craft_item(character: CharacterAPI, item: Item, quantity: int = 1, ordered: bool = False, return_to_bank: bool = True):
     logger.info(f"craft_item craft {quantity} {item}")
     code = item.code
     craft = item.craft
@@ -308,8 +311,9 @@ def craft_item(character: CharacterAPI, item: Item, quantity: int = 1, ordered: 
     character.move_character(shop_x,shop_y)
     xp = character.craft(item.code,quantity)
     logger.info(f"craft_item craft item result {xp}")
-    character.move_character(bank_x,bank_y)
-    character.deposit_to_bank(item.code, quantity)
+    if return_to_bank:
+        character.move_character(bank_x,bank_y)
+        character.deposit_to_bank(item.code, quantity)
     return xp != -1
 
 def has_requirements(character: CharacterAPI, item_code: str, requirements, ordered: bool, quantity: int = 1, contents: List[Dict] = None):
@@ -352,8 +356,8 @@ def has_requirements(character: CharacterAPI, item_code: str, requirements, orde
     return need_something
 
 def order_items(character: CharacterAPI, item_code: str, quantity: int):
-    logger.info(f'Ordering {quantity} {item_code}')
     item: Item = api.get_item(item_code)
+    logger.info(f'Ordering {quantity} {item_code} type {item.type}')
     if item.type != 'resource':
         logger.info(f'item is not resource to gather: {item}')
         return False
@@ -458,7 +462,7 @@ def choose_lowest_item(character: CharacterAPI, skill: str, lowest_skill: int = 
         return None
 
 
-def gather(character: CharacterAPI, item_code: str, quantity: int):
+def gather(character: CharacterAPI, item_code: str, quantity: int, return_to_bank: bool = True):
     logger.info(f'Gather {quantity} {item_code}')
 
     item: Item = api.get_item(item_code)
@@ -469,7 +473,7 @@ def gather(character: CharacterAPI, item_code: str, quantity: int):
         return False
     
     if subtype == 'mob' or item_code == 'milk_bucket' or item_code == 'raw_wolf_meat':
-        if hunt_for_items(character, item_code, quantity):
+        if hunt_for_items(character, item_code, quantity) and return_to_bank:
             x,y = character.find_closest_content('bank','bank')
             character.move_character(x,y)
             character.deposit_all_inventory_to_bank()
@@ -486,7 +490,7 @@ def gather(character: CharacterAPI, item_code: str, quantity: int):
         logger.info(f"{item.code} requires {space_per_item} space per item, batch size {batch_size}")
         while quantity > 0:
             current_batch = min(batch_size, quantity)
-            if not craft_item(character, item, current_batch):
+            if not craft_item(character, item, current_batch, return_to_bank=return_to_bank):
                 logger.info(f"gather cannot craft {item_code}")
                 return False
             quantity -= current_batch
@@ -522,10 +526,11 @@ def gather(character: CharacterAPI, item_code: str, quantity: int):
 
     character.move_character(x,y)
     result = character.gather(quantity)
-    x,y = character.find_closest_content('bank','bank')
-    character.move_character(x,y)
-    character.unequip('weapon')
-    character.deposit_all_inventory_to_bank()
+    if return_to_bank:
+        x,y = character.find_closest_content('bank','bank')
+        character.move_character(x,y)
+        character.unequip('weapon')
+        character.deposit_all_inventory_to_bank()
     return result
 
 def choose_random_resource(character: CharacterAPI, skill: str, skill_level: int):
@@ -617,6 +622,7 @@ def handle_monsters_task(character: CharacterAPI, task_data: Dict):
     character.move_character(x, y)
     character.complete_task()
 
+ordered_item_task = False
 def handle_items_task(character: CharacterAPI, task_data: Dict):
     logger.info(f"Handling items task: {task_data}")
     
@@ -628,7 +634,7 @@ def handle_items_task(character: CharacterAPI, task_data: Dict):
     
     total = task_data['total']
     quantity = total - progress 
-    batch_size = 25
+    batch_size = character.api.char.get_inventory_space()
 
     while quantity > 0:
         current_batch = min(batch_size, quantity)
@@ -637,19 +643,24 @@ def handle_items_task(character: CharacterAPI, task_data: Dict):
         if character.withdraw_from_bank(task_data['code'],current_batch):
             logger.info(f"Got {current_batch} from the bank, go exchange")
         else:
-            gather(character, task_data['code'], current_batch)
-            character.withdraw_from_bank(task_data['code'],current_batch)
+            if not gather(character, task_data['code'], current_batch, return_to_bank=False):
+                if not ordered_item_task:
+                    logger.info(f"handle_items_task cannot gather {task_data['code']}, ordering")
+                    order_items(character, task_data['code'], quantity)
+                    ordered_item_task = True
+                return
         
         x, y = character.find_closest_content('tasks_master','items')
         character.move_character(x, y)
-        
         character.trade_task_items(task_data['code'], current_batch)
         
         quantity -= current_batch
 
+    ordered_item_task = False
     x, y = character.find_closest_content('tasks_master','items')
     character.move_character(x, y)
     character.complete_task()
+    character.choose_task()
     trade_coins(character)
 
 def trade_coins(character: CharacterAPI):
