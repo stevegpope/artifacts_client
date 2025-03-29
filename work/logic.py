@@ -24,7 +24,12 @@ def process():
 
     bank_x,bank_y = api.find_closest_content('bank','bank')
     api.move_character(bank_x,bank_y)
-    api.deposit_all_inventory_to_bank()
+    api.rest()
+    # derobe
+    slots = ["rune","shield","helmet","body_armor","leg_armor","boots","ring1","ring2","amulet","artifact1","artifact2","artifact3","utility1","utility2"]
+    for slot in slots:
+        api.unequip(slot)
+
     if role == 'smarty':
         smarty = Smarty(logger, api)
 

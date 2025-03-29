@@ -2,8 +2,7 @@ import random
 from time import sleep
 from typing import Dict, List
 from work.api import CharacterAPI
-from artifactsmmo_wrapper.subclasses import *
-
+from artifactsmmo_wrapper.subclasses import Item, Monster, Resource
 from work.task_queue import TaskQueue
 
 logger = None
@@ -84,7 +83,7 @@ def fill_orders(character: CharacterAPI, role: str):
         elif role == 'recycler':
             recycle(character)
         elif role == 'potion_maker':
-            item = character.get_item('fire_boost_potion')
+            item = character.get_item('minor_health_potion')
             craft_item(character, item, 10)
         elif role == 'lumberjack':
             gather_highest(character, 'woodcutting')
@@ -94,8 +93,6 @@ def fill_orders(character: CharacterAPI, role: str):
             gather_highest(character,'alchemy')
         elif role == 'alchemist':
             craft_gear(character, 'alchemy')
-        elif role == 'gudgeon':
-            gather(character, 'gudgeon', 100)
         elif role == 'pig_hunter':
             hunt(character, 'pig')
         elif role == 'ogre_hunter':
@@ -133,20 +130,13 @@ def recycle(character: CharacterAPI):
         if not craft:
             continue
         skill = craft['skill']
-        requirements = craft['items']
-        needs_crystal = False
-        for requirement in requirements:
-            if requirement['code'] == 'jasper_crystal':
-                needs_crystal = True
-                break
 
         skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting']
         if skill not in skills:
             continue
         if craft['level'] >= 10:
-            quantity = max(bankitem['quantity'] - 5,0)
-            if quantity > 0:
-                character.withdraw_from_bank(item.code, quantity)
+            logger.info(f"not touching high level {item.code}")
+            continue
         else:
             quantity = character.withdraw_all(item.code)
         if quantity == 0:
@@ -189,8 +179,11 @@ def gather_highest(character: CharacterAPI, skill: str = None):
     elif skill == 'fishing':
         logger.info(f"try and get fishing rod")
         if character.withdraw_from_bank('spruce_fishing_rod',1):
+            logger.info(f"{character} withdrew rod, equip")
             character.unequip('weapon')
             character.equip('spruce_fishing_rod','weapon')
+        else:
+            logger.info(f"{character} cannot withdrew rod, do not equip")
 
     skill_level = character.get_skill_level(skill)
     x,y = choose_random_resource(character, skill, skill_level)
@@ -514,8 +507,11 @@ def gather(character: CharacterAPI, item_code: str, quantity: int, return_to_ban
     elif subtype == 'fishing':
         logger.info(f"try and get fishing rod")
         if character.withdraw_from_bank('spruce_fishing_rod',1):
+            logger.info(f"{character} withdrew rod, equip")
             character.unequip('weapon')
             character.equip('spruce_fishing_rod','weapon')
+        else:
+            logger.info(f"{character} cannot withdrew rod, do not equip")
 
     logger.info(f"find resource drop for {item_code}")
     x,y,success = find_resource_drop(character,item_code)
@@ -624,6 +620,7 @@ def handle_monsters_task(character: CharacterAPI, task_data: Dict):
 
 ordered_item_task = False
 def handle_items_task(character: CharacterAPI, task_data: Dict):
+    global ordered_item_task
     logger.info(f"Handling items task: {task_data}")
     
     # Check if 'progress' key exists in task_data

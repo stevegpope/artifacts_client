@@ -1,3 +1,4 @@
+import json
 import math
 import time
 import requests
@@ -5,7 +6,7 @@ import logging
 from typing import Optional, Dict, List, Tuple
 import re
 from artifactsmmo_wrapper import wrapper, logger, ArtifactsAPI
-from artifactsmmo_wrapper.subclasses import *
+from artifactsmmo_wrapper.subclasses import Item, Monster, Resource
 
 class CharacterAPI:
     def __init__(self, my_logger: logging.Logger, token: str, character_name: str):
@@ -369,14 +370,19 @@ class CharacterAPI:
         target_monster_level = level - 10
         self.logger.info(f'Fight loop level {level}, target {target_monster_level}')
 
-        monsters = self.api.monsters.get(min_level=target_monster_level,max_level=level-7)
-        if not monsters:
-            self.logger.info('No monsters found within the level range')
-            return None
-        
-        # Find the monster closest to target_monster_level
-        closest_monster = min(monsters, key=lambda x: abs(x.level - target_monster_level))
-        self.logger.info(f'Closest monster found: {closest_monster}')
+        # Special case, always be on the lookout for bandit lizards
+        x,y = self.find_closest_content('monster', 'bandit_lizard')
+        if x and y:
+            closest_monster = self.api.monsters.get('bandit_lizard')
+        else:
+            monsters = self.api.monsters.get(min_level=target_monster_level,max_level=level-7)
+            if not monsters:
+                self.logger.info('No monsters found within the level range')
+                return None
+            
+            # Find the monster closest to target_monster_level
+            closest_monster = min(monsters, key=lambda x: abs(x.level - target_monster_level))
+            self.logger.info(f'Closest monster found: {closest_monster}')
         
         self.gear_up(closest_monster)
 
@@ -437,17 +443,24 @@ class CharacterAPI:
                 take = min(space,quantity)
                 if take > 0:
                     if self.withdraw_from_bank(code,take):
+                        self.logger.info(f"{self.current_character}: withdrew {quantity} {code}, {item['quantity']-quantity} remains")
                         return take
         return 0
 
     def withdraw_from_bank(self, code: str, quantity: int) -> Optional[Dict]:
         try:
             response = self.api.actions.bank_withdraw_item(code, quantity)
-            if response:
-                return response
-            else:
-                self.logger.error(f"{self.current_character}: Failed to withdraw items from the bank.")
-        except:
+            data = response["data"]
+            bank = data.get('bank',[])
+            for item in bank:
+                if item['code'] == code:
+                    quantity_remaining = item.get('quantity',None)
+                    self.logger.info(f"{self.api.char.name} withdrew {quantity} {code}, {quantity_remaining} remains")
+                    break
+
+            return True
+        except Exception as e:
+            self.logger.info(f"withdraw_from_bank error {e}")
             pass
         return None
     
@@ -465,8 +478,6 @@ class CharacterAPI:
         self.logger.info(f"{self.current_character}: Recycle {quantity} {code}")
         response = self.api.actions.recycle_item(code, quantity)
         if response:
-            details = response.get("data", {}).get("details", {})
-            xp_gained = details.get("xp", 0)
             return response
         else:
             self.logger.error(f"{self.current_character}: Failed to recycle")

@@ -1,802 +1,122 @@
 [
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "spruce_wood"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "spruce_wood"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "spruce_wood"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "spruce_wood"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "spruce_wood"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "spruce_wood"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "spruce_wood"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "spruce_wood"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "spruce_wood"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "spruce_wood"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     },
     {
         "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
-    },
-    {
-        "role": "forager",
-        "code": "copper_ore"
+        "code": "iron_ore"
     }
 ]
