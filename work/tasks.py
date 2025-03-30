@@ -46,7 +46,7 @@ def fill_orders(character: CharacterAPI, role: str):
             if task_code in banned_tasks:
                 continue
             match = role == task_role
-            if match or role == 'crafter' or role == 'forager' or role == 'tasker':
+            if match or role == 'top_crafter' or role == 'crafter' or role == 'forager' or role == 'tasker':
                 logger.info(f'first banned tasks: {banned_tasks}, code {task_code}')
                 chosen_tasks.append(task)
                 chosen_code = task_code
@@ -79,7 +79,7 @@ def fill_orders(character: CharacterAPI, role: str):
         elif role == 'forager':
             gather_highest(character)
         elif role == 'chef':
-            craft_gear(character, 'cooking')
+            craft_available(character, 'cooking')
         elif role == 'recycler':
             recycle(character)
         elif role == 'potion_maker':
@@ -134,11 +134,8 @@ def recycle(character: CharacterAPI):
         skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting']
         if skill not in skills:
             continue
-        if craft['level'] >= 10:
-            logger.info(f"not touching high level {item.code}")
-            continue
-        else:
-            quantity = character.withdraw_all(item.code)
+
+        quantity = character.withdraw_all_but_5(item.code, contents)
         if quantity == 0:
             continue
         shop_x,shop_y = character.find_closest_content('workshop',skill)
@@ -194,6 +191,35 @@ def gather_highest(character: CharacterAPI, skill: str = None):
     character.unequip('weapon')
     character.deposit_all_inventory_to_bank()
 
+def craft_available(character: CharacterAPI, skill: str):
+    contents = character.get_bank_contents()
+
+    item = choose_lowest_item(character, skill, 1)
+    if not item:
+        logger.info(f"craft_available cannot craft anything for {skill}, we are done")
+        exit(0)
+
+    logger.info(f"{character.api.char.name} craft_available craft {item.code}")
+    space = character.api.char.get_inventory_space()
+    space_per_item = 0
+    for craftitem in item.craft.get('items',[]):
+        space_per_item += craftitem.get('quantity',1)
+
+    batch_size = int(space / space_per_item)
+
+    if has_requirements(character, item.code,  item.craft['items'], ordered=True, quantity=batch_size, contents=contents) != 0:
+        logger.info(f"{character.api.char.name} cannot get stuff to craft {batch_size} {item.code} currently, try later")
+        return False
+    
+    if not craft_item(character, item, batch_size, ordered=True):
+        logger.info(f"craft_available can't craft {item.code} now, leaving in place")
+    else:
+        logger.info(f"craft_available finished making {item.code}, removing from current orders")
+        current_orders.delete_entry(item.code)
+    logger.info(f"craft_available current orders {current_orders.read_tasks()}")
+    logger.info(f"craft_available banned orders {banned_orders.read_tasks()}")
+    return True
+
 def craft_gear(character: CharacterAPI, skill: str = None, top: bool = False):
     skills = ['weaponcrafting', 'gearcrafting', 'jewelrycrafting', 'cooking','alchemy']
     if top or not skill:
@@ -223,7 +249,7 @@ def craft_gear(character: CharacterAPI, skill: str = None, top: bool = False):
         quantity = 25
         lowest_skill = skill
         skill_level = character.get_skill_level(skill)
-        lowest_choice_level = 10
+        lowest_choice_level = 1
         ordered = False # no ordering items for you
 
     item = choose_lowest_item(character, lowest_skill, lowest_choice_level)
@@ -263,8 +289,7 @@ def craft_orders(character: CharacterAPI, top: bool = False):
             current_orders.delete_entry(code)
     
     craft_gear(character, top = top)
-    recycle(character)
-
+    #recycle(character)
 
 def craft_item(character: CharacterAPI, item: Item, quantity: int = 1, ordered: bool = False, return_to_bank: bool = True):
     logger.info(f"craft_item craft {quantity} {item}")
@@ -311,7 +336,7 @@ def craft_item(character: CharacterAPI, item: Item, quantity: int = 1, ordered: 
 
 def has_requirements(character: CharacterAPI, item_code: str, requirements, ordered: bool, quantity: int = 1, contents: List[Dict] = None):
     need_something = 0
-    if contents is not None:
+    if contents:
         bank_contents = contents
     else:
         bank_contents = api.get_bank_contents()
@@ -320,7 +345,7 @@ def has_requirements(character: CharacterAPI, item_code: str, requirements, orde
         logger.info(f"has_requirements check for {required_quantity} {requirement['code']}")
         found = False
         for item in bank_contents:
-            if requirement['code'] == item['code'] and item['quantity'] >= requirement['quantity']:
+            if requirement['code'] == item['code'] and item['quantity'] >= required_quantity:
                 logger.info(f"has_requirements Already have {required_quantity} enough {requirement['code']} to craft {item_code}")
                 found = True
         if not found:
@@ -631,7 +656,7 @@ def handle_items_task(character: CharacterAPI, task_data: Dict):
     
     total = task_data['total']
     quantity = total - progress 
-    batch_size = character.api.char.get_inventory_space()
+    batch_size = character.api.char.get_inventory_space() - 25 # leave room for extras
 
     while quantity > 0:
         current_batch = min(batch_size, quantity)

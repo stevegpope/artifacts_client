@@ -435,6 +435,20 @@ class CharacterAPI:
             all_data.extend(response.get("data",[]))
         return all_data
     
+    def withdraw_all_but_5(self, code: str, contents = None) -> int:
+        if not contents:
+            contents = self.get_bank_contents()
+        space = self.api.char.get_inventory_space() - 25
+        for item in contents:
+            if item["code"] == code:
+                quantity = min(item['quantity'],100)
+                take = min(space,quantity-5)
+                if take > 0:
+                    if self.withdraw_from_bank(code,take):
+                        self.logger.info(f"{self.api.char.name}: withdrew {quantity} {code}, {item['quantity']-quantity} remains")
+                        return take
+        return 0
+
     def withdraw_all(self, code: str, contents = None) -> int:
         if not contents:
             contents = self.get_bank_contents()
@@ -445,7 +459,7 @@ class CharacterAPI:
                 take = min(space,quantity)
                 if take > 0:
                     if self.withdraw_from_bank(code,take):
-                        self.logger.info(f"{self.current_character}: withdrew {quantity} {code}, {item['quantity']-quantity} remains")
+                        self.logger.info(f"{self.api.char.name}: withdrew {quantity} {code}, {item['quantity']-quantity} remains")
                         return take
         return 0
 
