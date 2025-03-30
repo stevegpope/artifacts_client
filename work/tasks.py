@@ -484,13 +484,6 @@ def gather(character: CharacterAPI, item_code: str, quantity: int, return_to_ban
     logger.info(f'Gather {quantity} {item_code}')
 
     item: Item = character.get_item(item_code)
-    item_skill = item.subtype
-    skill_level = character.get_skill_level(item_skill)
-    if item.level > skill_level:
-        logger.info(f'cannot gather high level {item} level {item.level}, {character.api.char.name} {item_skill}: {skill_level}')
-        return False
-    else:
-        logger.info(f'ok to gather {item} level {item.level}, {character.api.char.name} {item_skill}: {skill_level}')
 
     subtype = item.subtype
     if subtype == 'task':
@@ -498,11 +491,15 @@ def gather(character: CharacterAPI, item_code: str, quantity: int, return_to_ban
         return False
     
     if subtype == 'mob' or item_code == 'milk_bucket' or item_code == 'raw_wolf_meat':
-        if hunt_for_items(character, item_code, quantity) and return_to_bank:
-            x,y = character.find_closest_content('bank','bank')
-            character.move_character(x,y)
-            character.deposit_all_inventory_to_bank()
+        if hunt_for_items(character, item_code, quantity):
+            if return_to_bank:
+                x,y = character.find_closest_content('bank','bank')
+                character.move_character(x,y)
+                character.deposit_all_inventory_to_bank()
             return True
+        else:
+            logger.info(f"could not find or fight to get {item_code}")
+            return False
 
     if item.craft != None:
         logger.info(f'gather to gather {item_code} need to craft it {item.craft}')
@@ -520,6 +517,14 @@ def gather(character: CharacterAPI, item_code: str, quantity: int, return_to_ban
                 return False
             quantity -= current_batch
         return True
+
+    item_skill = item.subtype
+    skill_level = character.get_skill_level(item_skill)
+    if item.level > skill_level:
+        logger.info(f'cannot gather high level {item} level {item.level}, {character.api.char.name} {item_skill}: {skill_level}')
+        return False
+    else:
+        logger.info(f'ok to gather {item} level {item.level}, {character.api.char.name} {item_skill}: {skill_level}')
 
     if subtype == 'mining':
         logger.info(f"try and get pick")
@@ -600,6 +605,13 @@ def hunt_for_items(character, item_code, quantity):
     monsters = character.api.monsters.get(drop=item_code)
     for monster in monsters:
         monster: Monster
+        x,y = character.find_closest_content('monster',monster.code)
+        if x and y:
+            logger.info(f"monster {monster.code} is on the map")
+        else:
+            logger.info(f"monster {monster.code} is on the map")
+            continue
+
         drops = monster.drops
         if drops:
             for drop in drops:
@@ -616,6 +628,7 @@ def hunt_for_items(character, item_code, quantity):
                     else:
                         logger.info(f"cannot find monster on map")
                         return False
+    return False
 
 def do_tasks(character: CharacterAPI, fight_tasker: bool = False):
     task = character.choose_task(fight_tasker)

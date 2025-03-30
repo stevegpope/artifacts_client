@@ -27,13 +27,11 @@ class CharacterAPI:
 
     def get_item(self, item_code) -> Item: 
         item = self.api.items.get(item_code)
-        print(f"base item {item}")
         item_level = 1
         try:
             if item.level > 0:
-                print(f"item has level {item.level}")
                 item_level = item.level
-        except:
+        except Exception as e:
             if item.craft is not None:
                 item_level = item.craft.get('level',1)
             elif item.code == 'old_boots': # not set
