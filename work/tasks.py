@@ -125,7 +125,7 @@ def recycle(character: CharacterAPI):
     contents = character.get_bank_contents()
     found_something = False
     for bankitem in contents:
-        item = api.get_item(bankitem['code'])
+        item = character.get_item(bankitem['code'])
         craft = item.craft
         if not craft:
             continue
@@ -339,7 +339,7 @@ def has_requirements(character: CharacterAPI, item_code: str, requirements, orde
     if contents:
         bank_contents = contents
     else:
-        bank_contents = api.get_bank_contents()
+        bank_contents = character.get_bank_contents()
     for requirement in requirements:
         required_quantity = requirement['quantity'] * quantity
         logger.info(f"has_requirements check for {required_quantity} {requirement['code']}")
@@ -374,7 +374,7 @@ def has_requirements(character: CharacterAPI, item_code: str, requirements, orde
     return need_something
 
 def order_items(character: CharacterAPI, item_code: str, quantity: int):
-    item: Item = api.get_item(item_code)
+    item: Item = character.get_item(item_code)
     logger.info(f'Ordering {quantity} {item_code} type {item.type}')
     if item.type != 'resource':
         logger.info(f'item is not resource to gather: {item}')
@@ -428,7 +428,7 @@ def choose_lowest_item(character: CharacterAPI, skill: str, lowest_skill: int = 
     
     # Get all craftable items at or below the character's skill level
     craftable_items = []
-    items = api.all_items()
+    items = character.all_items()
     banned_tasks = banned_orders.read_tasks()
 
     logger.info(f"there are {len(items)} items in total")
@@ -483,7 +483,14 @@ def choose_lowest_item(character: CharacterAPI, skill: str, lowest_skill: int = 
 def gather(character: CharacterAPI, item_code: str, quantity: int, return_to_bank: bool = True):
     logger.info(f'Gather {quantity} {item_code}')
 
-    item: Item = api.get_item(item_code)
+    item: Item = character.get_item(item_code)
+    item_skill = item.subtype
+    skill_level = character.get_skill_level(item_skill)
+    if item.level > skill_level:
+        logger.info(f'cannot gather high level {item} level {item.level}, {character.api.char.name} {item_skill}: {skill_level}')
+        return False
+    else:
+        logger.info(f'ok to gather {item} level {item.level}, {character.api.char.name} {item_skill}: {skill_level}')
 
     subtype = item.subtype
     if subtype == 'task':
