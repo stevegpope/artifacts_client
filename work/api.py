@@ -445,7 +445,6 @@ class CharacterAPI:
                 take = min(space,quantity-5)
                 if take > 0:
                     if self.withdraw_from_bank(code,take):
-                        self.logger.info(f"{self.api.char.name}: withdrew {quantity} {code}, {item['quantity']-quantity} remains")
                         return take
         return 0
 
@@ -471,7 +470,7 @@ class CharacterAPI:
             for item in bank:
                 if item['code'] == code:
                     quantity_remaining = item.get('quantity',None)
-                    self.logger.info(f"{self.api.char.name} withdrew {quantity} {code}, {quantity_remaining} remains")
+                    self.logger.info(f"withdraw_from_bank {self.api.char.name} withdrew {quantity} {code}, {quantity_remaining} remains")
                     break
 
             return True

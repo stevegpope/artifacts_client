@@ -45,8 +45,8 @@ def fill_orders(character: CharacterAPI, role: str):
             # First matching task — lock in the code and role
             if task_code in banned_tasks:
                 continue
-            match = role == task_role
-            if match or role == 'top_crafter' or role == 'crafter' or role == 'forager' or role == 'tasker':
+            match = role == task_role or (role == 'top_crafter' and task_role == 'forager') # top_crafter can forage, not fight
+            if match or role == 'crafter' or role == 'forager' or role == 'tasker':
                 logger.info(f'first banned tasks: {banned_tasks}, code {task_code}')
                 chosen_tasks.append(task)
                 chosen_code = task_code
@@ -119,12 +119,17 @@ def hunt(character: CharacterAPI, monster_code: str):
     character.move_character(x,y)
 
 def recycle(character: CharacterAPI):
-    logger.info("Go recycling")
+    logger.info(f"{character.api.char.name} Go recycling")
     x,y = character.find_closest_content('bank','bank')
     character.move_character(x,y)
     contents = character.get_bank_contents()
     found_something = False
     for bankitem in contents:
+        existing_quantity = bankitem.get('quantity',1)
+        if existing_quantity <= 5:
+            logger.info(f"recycle not recycling {bankitem['code']}, only have {existing_quantity}")
+            continue
+
         item = character.get_item(bankitem['code'])
         craft = item.craft
         if not craft:
@@ -137,7 +142,10 @@ def recycle(character: CharacterAPI):
 
         quantity = character.withdraw_all_but_5(item.code, contents)
         if quantity == 0:
+            logger.info(f"{character.api.char.name} got {quantity} {item.code} to recycle, skipping")
             continue
+        else:
+            logger.info(f"{character.api.char.name} got {quantity} {item.code} to recycle")
         shop_x,shop_y = character.find_closest_content('workshop',skill)
         character.move_character(shop_x,shop_y)
         character.recycle(item.code,quantity)
@@ -289,7 +297,7 @@ def craft_orders(character: CharacterAPI, top: bool = False):
             current_orders.delete_entry(code)
     
     craft_gear(character, top = top)
-    #recycle(character)
+    recycle(character)
 
 def craft_item(character: CharacterAPI, item: Item, quantity: int = 1, ordered: bool = False, return_to_bank: bool = True):
     logger.info(f"craft_item craft {quantity} {item}")
