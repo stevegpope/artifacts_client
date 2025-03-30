@@ -374,6 +374,8 @@ class CharacterAPI:
         x,y = self.find_closest_content('monster', 'bandit_lizard')
         if x and y:
             closest_monster = self.api.monsters.get('bandit_lizard')
+            if self.withdraw_all('small_antidote') > 0:
+                self.equip_utility('small_antidote')
         else:
             monsters = self.api.monsters.get(min_level=target_monster_level,max_level=level-7)
             if not monsters:
