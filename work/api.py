@@ -10,7 +10,7 @@ from artifactsmmo_wrapper import wrapper, logger, ArtifactsAPI
 from artifactsmmo_wrapper.subclasses import Item, Monster, Resource
 
 class CharacterAPI:
-    def __init__(self, my_logger: logging.Logger, token: str, character_name: str):
+    def __init__(self, my_logger: logging.Logger, token: str, character_name: str, role: str):
         """
         Initializes the CharacterAPI with the provided logger, token, and character name.
 
@@ -22,6 +22,7 @@ class CharacterAPI:
         self.logger = my_logger
         wrapper.token = token
         self.current_character = character_name
+        self.role = role
 
         self.api: ArtifactsAPI = wrapper.character(character_name)
         logger.setLevel("DEBUG")
@@ -161,75 +162,75 @@ class CharacterAPI:
         self.get_consumables(contents, attack_elements, defense_elements, weapon_attack_elements)
 
     def get_consumables(self, contents, attack_elements, defense_elements, weapon_attack_elements: List):
-        self.logger.info("get_consumables")
         character_data = self.get_character()
-        best_items = {}
-        slots = ['utility1_slot','utility2_slot']
-        for slot in slots:
-            try:
-                original_item = getattr(character_data, slot)
-                best_items[slot] = original_item
-            except AttributeError:
-                print(f"get_consumables slot '{slot}' not found.")
-                best_items['slot'] = None
-                exit(1)
-
-        for item_dict in contents:
-            item_code = item_dict['code']
-            item = self.get_item(item_code)
-            if item.type != 'utility':
-                continue
-
-            if item.level != None and item.level > character_data.level:
-                self.logger.info(f"get_consumables item {item.code} is too high level {item.level} for me at {self.api.char.level}")
-                continue
-            
-            for best_key in best_items.keys():
-                best_item_code = best_items[best_key]
-                best_item = None
-                if best_item_code:
-                    best_item = self.get_item(best_item_code)
-                if self.item_better(best_item, item, attack_elements, defense_elements, weapon_attack_elements):
-                    if best_key == 'utility1_slot':
-                        if best_items['utility2_slot'] != item.code:
-                            best_items[best_key] = item.code
-                    else:
-                        if best_items['utility1_slot'] != item.code:
-                            best_items[best_key] = item.code
-
-        for slot in best_items.keys():
-            best_item_code = best_items[slot]
-            current = self.get_slot(slot)
-            if current != best_item_code:
-                equipped = False
-                self.logger.info(f"get_consumables switch from {current} to {best_item_code} in slot {slot}")
-                if current:
-                    if slot == 'utility1_slot':
-                        self.api.actions.unequip_item('utility1', self.api.char.utility1_slot_quantity)
-                    else:
-                        self.api.actions.unequip_item('utility2', self.api.char.utility2_slot_quantity)
-                quantity = self.withdraw_all(best_item_code, contents)
-                if quantity > 0:
-                    slot_name = slot.replace('_slot','')
-                    if self.api.actions.equip_item(best_item_code, slot_name, quantity):
-                        equipped = True
-                if not equipped:
-                    self.logger.info(f"\n\nERROR\n\nget_consumables could not equip {best_item_code}, probably not really in the bank")
+        if self.role == 'fighter':
+            best_items = {}
+            slots = ['utility1_slot','utility2_slot']
+            for slot in slots:
+                try:
+                    original_item = getattr(character_data, slot)
+                    best_items[slot] = original_item
+                except AttributeError:
+                    print(f"get_consumables slot '{slot}' not found.")
+                    best_items['slot'] = None
                     exit(1)
-            else:
-                self.logger.info(f"top up on {current} in {slot}")
-                if slot == 'utility1_slot':
-                    current_quantity = self.api.char.utility1_slot_quantity
-                else:
-                    current_quantity = self.api.char.utility2_slot_quantity
-                taken = self.withdraw_all(current, contents)
-                ideal_amount = 100 - current_quantity
-                quantity = min(ideal_amount, taken)
-                if quantity == 0:
-                    self.logger.info(f"no more {current} to add")
+
+            for item_dict in contents:
+                item_code = item_dict['code']
+                item = self.get_item(item_code)
+                if item.type != 'utility':
                     continue
-                slot_name = slot.replace('_slot','')
-                self.api.actions.equip_item(current, slot_name, quantity)
+
+                if item.level != None and item.level > character_data.level:
+                    self.logger.info(f"get_consumables item {item.code} is too high level {item.level} for me at {self.api.char.level}")
+                    continue
+                
+                for best_key in best_items.keys():
+                    best_item_code = best_items[best_key]
+                    best_item = None
+                    if best_item_code:
+                        best_item = self.get_item(best_item_code)
+                    if self.item_better(best_item, item, attack_elements, defense_elements, weapon_attack_elements):
+                        if best_key == 'utility1_slot':
+                            if best_items['utility2_slot'] != item.code:
+                                best_items[best_key] = item.code
+                        else:
+                            if best_items['utility1_slot'] != item.code:
+                                best_items[best_key] = item.code
+
+            for slot in best_items.keys():
+                best_item_code = best_items[slot]
+                current = self.get_slot(slot)
+                if current != best_item_code:
+                    equipped = False
+                    self.logger.info(f"get_consumables switch from {current} to {best_item_code} in slot {slot}")
+                    if current:
+                        if slot == 'utility1_slot':
+                            self.api.actions.unequip_item('utility1', self.api.char.utility1_slot_quantity)
+                        else:
+                            self.api.actions.unequip_item('utility2', self.api.char.utility2_slot_quantity)
+                    quantity = self.withdraw_all(best_item_code, contents)
+                    if quantity > 0:
+                        slot_name = slot.replace('_slot','')
+                        if self.api.actions.equip_item(best_item_code, slot_name, quantity):
+                            equipped = True
+                    if not equipped:
+                        self.logger.info(f"\n\nERROR\n\nget_consumables could not equip {best_item_code}, probably not really in the bank")
+                        exit(1)
+                elif current != None:
+                    self.logger.info(f"top up on {current} in {slot}")
+                    if slot == 'utility1_slot':
+                        current_quantity = self.api.char.utility1_slot_quantity
+                    else:
+                        current_quantity = self.api.char.utility2_slot_quantity
+                    taken = self.withdraw_all(current, contents)
+                    ideal_amount = 100 - current_quantity
+                    quantity = min(ideal_amount, taken)
+                    if quantity == 0:
+                        self.logger.info(f"no more {current} to add")
+                        continue
+                    slot_name = slot.replace('_slot','')
+                    self.api.actions.equip_item(current, slot_name, quantity)
 
         self.deposit_all_inventory_to_bank()
         for item_dict in contents:
@@ -299,6 +300,7 @@ class CharacterAPI:
 
     def item_better(self, best_item, item, attack_elements, defense_elements, weapon_attack_elements: List):
         if item.level > self.api.char.level:
+            self.logger.info(f"{item.code} too high level {item.level}")
             return False
         
         best_total = 0
@@ -319,6 +321,7 @@ class CharacterAPI:
         value = 0
         estimated_rounds = 40
         for effect in item.effects:
+            add = 0
             # Hp once per battle
             if effect.code == "hp":
                 add = effect.attributes['value']
@@ -331,6 +334,16 @@ class CharacterAPI:
 
             # Restore per round
             if effect.code == "restore":
+                add = effect.attributes['value'] * estimated_rounds
+                value += add
+
+
+            # critical strike per round
+            if effect.code == "critical_strike":
+                add += effect.attributes['value'] * estimated_rounds
+
+            # Lifesteal per round, but percentage based on crit (which we are also maximizing)
+            if effect.code == "lifesteal":
                 add = effect.attributes['value'] * estimated_rounds
                 value += add
 
@@ -366,6 +379,9 @@ class CharacterAPI:
                         defense_element_value = defense_elements[element]
                         add = max(effect.attributes['value'] - defense_element_value, 0) * estimated_rounds
                         value += add
+
+            # Debugging
+            #self.logger.info(f"calculate_item_value add {add} for effect {effect.code}")
         return value
 
     def fight_xp(self):

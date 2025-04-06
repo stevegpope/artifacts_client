@@ -1,274 +1,58 @@
 [
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "support",
+        "code": "sunflower"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "support",
+        "code": "sunflower"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "support",
+        "code": "sunflower"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "support",
+        "code": "sunflower"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "support",
+        "code": "sunflower"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "support",
+        "code": "sunflower"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "support",
+        "code": "sunflower"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "support",
+        "code": "sunflower"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "support",
+        "code": "sunflower"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "support",
+        "code": "sunflower"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "fighter",
+        "code": "lizard_eye"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "fighter",
+        "code": "lizard_eye"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "fighter",
+        "code": "lizard_eye"
     },
     {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
-    },
-    {
-        "role": "crafter",
-        "code": "ash_wood"
+        "role": "fighter",
+        "code": "lizard_eye"
     }
 ]

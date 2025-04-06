@@ -16,7 +16,7 @@ def setup_logic(m_logger, m_token, m_character, m_role):
     token = m_token
     character = m_character
     role = m_role
-    api = CharacterAPI(logger, m_token, m_character)
+    api = CharacterAPI(logger, m_token, m_character, role)
     setup_tasks(m_logger,m_character, m_role, api)
 
 def process():
