@@ -23,7 +23,7 @@ def setup_tasks(m_logger, m_character, role, m_api):
     task_queue = TaskQueue()
     current_orders = TaskQueue(f"C:\\Users\\sarah\\Desktop\\code\\artifacts\\work\\tasks\\current_orders_{m_character}.json")
     banned_orders = TaskQueue(f"C:\\Users\\sarah\\Desktop\\code\\artifacts\\work\\tasks\\banned_orders_{m_character}.json")
-    #current_orders.clear_tasks()
+    current_orders.clear_tasks()
     banned_orders.clear_tasks()
 
 def fill_orders(character: CharacterAPI, role: str):
@@ -31,13 +31,16 @@ def fill_orders(character: CharacterAPI, role: str):
     character.deposit_all_inventory_to_bank()
     tasks = task_queue.read_tasks()
     logger.info(f"Fill orders for {role}")
+    
+    # Sort tasks so that 'crafter' roles come first. This will unlock crafters faster
+    sorted_tasks = sorted(tasks, key=lambda x: x.get('role') == 'crafter', reverse=True)
 
     chosen_tasks = []
     chosen_code = None
     tasks_to_delete = []  # Track indices to remove after processing
     banned_tasks = banned_orders.read_tasks()
 
-    for index, task in enumerate(tasks, start=1):
+    for index, task in enumerate(sorted_tasks, start=1):
         task_role = task.get('role', None)
         task_code = task.get('code', '')
 
@@ -45,8 +48,8 @@ def fill_orders(character: CharacterAPI, role: str):
             # First matching task — lock in the code and role
             if task_code in banned_tasks:
                 continue
-            match = role == task_role or (role == 'top_crafter' and task_role == 'forager') # top_crafter can forage, not fight
-            if match or role == 'crafter' or role == 'forager' or role == 'tasker':
+            match = role == task_role
+            if match or role == 'forager' or role == 'tasker' or role == 'crafter' or role == 'support':
                 logger.info(f'first banned tasks: {banned_tasks}, code {task_code}')
                 chosen_tasks.append(task)
                 chosen_code = task_code
@@ -92,11 +95,11 @@ def fill_orders(character: CharacterAPI, role: str):
         elif role == 'scavenger':
             gather_highest(character,'alchemy')
         elif role == 'alchemist':
-            craft_gear(character, 'alchemy')
+            craft_available(character, 'alchemy')
         elif role == 'pig_hunter':
             hunt(character, 'pig')
-        elif role == 'ogre_hunter':
-            hunt(character, 'ogre')
+        elif role == 'support':
+            craft_support(character)
     else:
         # Perform the gathered tasks
         task_count = len(chosen_tasks)
@@ -108,6 +111,12 @@ def fill_orders(character: CharacterAPI, role: str):
             for task in chosen_tasks:
                 task_queue.create_task(task)
     return True
+
+def craft_support(character: CharacterAPI):
+    # TODO: choose items based on baz level, but our crafters are not high enough level!
+    items = ['earth_boost_potion','air_boost_potion','fire_boost_potion','water_boost_potion','minor_health_potion']
+    item = character.get_item(random.choice(items))
+    craft_item(character, item, 10)
 
 def hunt(character: CharacterAPI, monster_code: str):
     x,y = character.find_closest_content('monster',monster_code)
@@ -263,7 +272,7 @@ def craft_gear(character: CharacterAPI, skill: str = None, top: bool = False):
     item = choose_lowest_item(character, lowest_skill, lowest_choice_level)
     if not item:
         logger.info(f"craft_gear cannot craft anything for {skill}, try another skill while we wait")
-        return craft_gear(character, random.choice(skills), top=True)
+        return False
 
     logger.info(f"craft_gear craft {item.code}")
     
@@ -425,7 +434,7 @@ def order_items(character: CharacterAPI, item_code: str, quantity: int):
         return True
 
     for index in range(quantity):
-        task_queue.create_task({"role":"forager","code": item_code})
+        task_queue.create_task({"role":m_role,"code": item_code})
     return True
 
 def choose_lowest_item(character: CharacterAPI, skill: str, lowest_skill: int = 1) -> Item:
@@ -614,10 +623,10 @@ def hunt_for_items(character, item_code, quantity):
     for monster in monsters:
         monster: Monster
         x,y = character.find_closest_content('monster',monster.code)
-        if x and y:
+        if (x, y) != (None, None):
             logger.info(f"monster {monster.code} is on the map")
         else:
-            logger.info(f"monster {monster.code} is on the map")
+            logger.info(f"monster {monster.code} is not on the map")
             continue
 
         drops = monster.drops
@@ -626,7 +635,7 @@ def hunt_for_items(character, item_code, quantity):
                 if drop.code == item_code:
                     character.gear_up(monster)
                     x,y = character.find_closest_content('monster',monster.code)
-                    if x and y:
+                    if (x, y) != (None, None):
                         character.move_character(x,y)
                         character.rest()
                         if not character.fight_drop(quantity, item_code):

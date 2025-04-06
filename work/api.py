@@ -1,5 +1,6 @@
 import json
 import math
+import random
 import time
 import requests
 import logging
@@ -233,6 +234,8 @@ class CharacterAPI:
         self.deposit_all_inventory_to_bank()
         for item_dict in contents:
             item = self.get_item(item_dict['code'])
+            if item.level != None and item.level > character_data.level:
+                continue
             if item.type == 'consumable' and item.subtype == 'food':
                 self.logger.info(f"load up on {item.code}")
                 self.withdraw_all(item.code, contents)
@@ -314,7 +317,7 @@ class CharacterAPI:
         # ogre attack elements: {'air': 0, 'earth': 80, 'fire': 0, 'water': 0}
         # ogre resist elements: {'air': 0, 'earth': 30, 'fire': -20, 'water': 0}
         value = 0
-        estimated_rounds = 7
+        estimated_rounds = 40
         for effect in item.effects:
             # Hp once per battle
             if effect.code == "hp":
@@ -372,18 +375,20 @@ class CharacterAPI:
 
         # Special case, always be on the lookout for bandit lizards
         x,y = self.find_closest_content('monster', 'bandit_lizard')
-        if x and y:
+        if (x, y) != (None, None):
             closest_monster = self.api.monsters.get('bandit_lizard')
             if self.withdraw_all('small_antidote') > 0:
                 self.equip_utility('small_antidote')
         else:
-            monsters = self.api.monsters.get(min_level=target_monster_level,max_level=level-7)
+            monsters = self.api.monsters.get(min_level=target_monster_level,max_level=level-6)
             if not monsters:
                 self.logger.info('No monsters found within the level range')
                 return None
             
-            # Find the monster closest to target_monster_level
-            closest_monster = min(monsters, key=lambda x: abs(x.level - target_monster_level))
+            while not ((x, y) != (None, None)):
+                closest_monster = random.choice(monsters)
+                self.logger.info(f"check for monster {closest_monster.code}")
+                x,y = self.find_closest_content('monster',closest_monster.code)
             self.logger.info(f'Closest monster found: {closest_monster}')
         
         self.gear_up(closest_monster)
@@ -740,6 +745,9 @@ class CharacterAPI:
             item_code = inventory_item.code
             item = self.api.items.get(item_code)
 
+            if item.level != None and item.level > self.api.level:
+                continue
+
             if item.type == 'consumable' and item.subtype == 'food':
                 heal_value = 1000
                 if item.effects:
@@ -752,15 +760,18 @@ class CharacterAPI:
                 quantity: int = min(inventory_item.quantity, round((desired_heal / heal_value) + 1))
 
                 self.logger.info(f"{self.current_character}: eat {quantity} {item.code}")
-                response = self.api.actions.use_item(item_code, quantity)
-                if response:
-                    character_json = response.get("data", {}).get("character", {})
-                    hp = character_json['hp']
-                    max_hp = character_json['max_hp']
-                    if (hp != max_hp):
-                        self.logger.info(f"{self.current_character}: Bit peckish stil...what else we got?")
-                        return self.eat()
-                    return True
+                try:
+                    response = self.api.actions.use_item(item_code, quantity)
+                    if response:
+                        character_json = response.get("data", {}).get("character", {})
+                        hp = character_json['hp']
+                        max_hp = character_json['max_hp']
+                        if (hp != max_hp):
+                            self.logger.info(f"{self.current_character}: Bit peckish stil...what else we got?")
+                            return self.eat()
+                        return True
+                except:
+                    pass
         return False
 
     def fight(self, combats=1):
@@ -869,7 +880,6 @@ class CharacterAPI:
         # Construct the attribute name for the skill level
         level_attribute = f"{skill_name.lower()}_level"
 
-        # Use getattr to dynamically access the attribute
         try:
             return getattr(self.api.char, level_attribute)
         except AttributeError:
@@ -912,15 +922,6 @@ class CharacterAPI:
         if response:
             self.logger.info(f"{self.current_character}: Exchanged task coins")
             self.logger.info(response)
-
-    def make_api_request(self, func, *args, **kwargs):
-        try:
-            result = func(*args, **kwargs)
-            return result
-        except Exception as e:
-            retry = self.handle_error(e)
-            if retry:
-                return self.make_api_request(func, args, kwargs)
 
     def handle_cooldown(self, cooldown: Dict):
         """
